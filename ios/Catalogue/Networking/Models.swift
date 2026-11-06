@@ -33,6 +33,17 @@ struct ProductSummary: Codable, Hashable, Sendable, Identifiable {
     let imagePath: String
 }
 
+/// GET /v1/products/{id}
+struct ProductDetail: Codable, Hashable, Sendable, Identifiable {
+    let id: String
+    let title: String
+    let price: Money
+    let rating: Rating
+    let imagePath: String
+    let description: String
+    let category: CategorySummary
+}
+
 /// GET /v1/home
 struct HomeScreen: Codable, Hashable, Sendable {
     let featured: [ProductSummary]

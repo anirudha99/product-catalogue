@@ -10,4 +10,12 @@ final class MockAPIClient: APIClient, @unchecked Sendable {
         homeCalls += 1
         return try homeResult.get()
     }
+
+    var productResult: Result<ProductDetail, APIError> = .failure(.server)
+    private(set) var productRequests: [String] = []
+
+    func product(id: String) async throws(APIError) -> ProductDetail {
+        productRequests.append(id)
+        return try productResult.get()
+    }
 }

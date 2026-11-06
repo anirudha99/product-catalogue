@@ -22,6 +22,15 @@ struct ContractDecodingTests {
         #expect(jacket.imagePath == "/v1/products/3/image")
     }
 
+    @Test func productDecodes() throws {
+        let product = try Fixtures.decode(ProductDetail.self, from: "product-3.json")
+
+        #expect(product.id == "3")
+        #expect(product.category == CategorySummary(slug: "mens-clothing", name: "Men's Clothing"))
+        #expect(product.description.hasPrefix("great outerwear jackets"))
+        #expect(product.imagePath == "/v1/products/3/image")
+    }
+
     @Test(arguments: [
         ("error-validation.json", 400, APIError.validation(
             fields: ["name": "Enter your name.", "email": "Enter a valid email address."],

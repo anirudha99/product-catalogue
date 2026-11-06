@@ -2,7 +2,8 @@ import { Router } from "express";
 import type { CatalogueService } from "../catalogue/CatalogueService.js";
 import type { ProductSource } from "../products/ProductSource.js";
 import { imageProxy } from "./imageProxy.js";
-import { toCategoryResponse, toProductSummary } from "./responses.js";
+import { toCategoryResponse, toProductDetail, toProductSummary } from "./responses.js";
+import { parseProductId } from "./schemas.js";
 
 export type RouteDeps = {
   catalogue: CatalogueService;
@@ -23,6 +24,11 @@ export function v1Routes({ catalogue, source, fetchImpl, upstreamTimeoutMs }: Ro
       featured: home.featured.map(toProductSummary),
       categories: home.categories.map(toCategoryResponse),
     });
+  });
+
+  router.get("/products/:id", async (req, res) => {
+    const product = await catalogue.product(parseProductId(req.params.id));
+    res.json(toProductDetail(product));
   });
 
   router.get(

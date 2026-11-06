@@ -14,6 +14,10 @@ final class LiveAPIClient: APIClient {
         try await get("/v1/home")
     }
 
+    func product(id: String) async throws(APIError) -> ProductDetail {
+        try await get("/v1/products/\(id)")
+    }
+
     // MARK: - Transport
 
     private func get<Response: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws(APIError) -> Response {

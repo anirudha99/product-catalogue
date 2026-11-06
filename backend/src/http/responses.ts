@@ -15,6 +15,19 @@ export type ProductSummaryResponse = {
   imagePath: string;
 };
 
+export type ProductDetailResponse = ProductSummaryResponse & {
+  description: string;
+  category: CategoryResponse;
+};
+
+export function toProductDetail(product: Product): ProductDetailResponse {
+  return {
+    ...toProductSummary(product),
+    description: product.description,
+    category: toCategoryResponse(product.category),
+  };
+}
+
 export function toCategoryResponse(category: Category): CategoryResponse {
   return { slug: category.slug, name: category.name };
 }

@@ -4,4 +4,5 @@ import Foundation
 /// so tests use MockAPIClient and a different transport only needs a new conformance.
 protocol APIClient: Sendable {
     func home() async throws(APIError) -> HomeScreen
+    func product(id: String) async throws(APIError) -> ProductDetail
 }

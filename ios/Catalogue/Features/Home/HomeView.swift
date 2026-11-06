@@ -2,8 +2,10 @@ import SwiftUI
 
 struct HomeView: View {
     @State private var model: HomeViewModel
+    private let api: any APIClient
 
     init(api: any APIClient) {
+        self.api = api
         _model = State(initialValue: HomeViewModel(api: api))
     }
 
@@ -21,6 +23,7 @@ struct HomeView: View {
             }
             .background(Theme.Colors.background)
             .navigationTitle("Catalogue")
+            .routeDestinations(api: api)
         }
         .task { await model.load() }
     }
@@ -38,7 +41,10 @@ struct HomeView: View {
                 spacing: Theme.Spacing.m
             ) {
                 ForEach(products) { product in
-                    ProductTile(product: product)
+                    NavigationLink(value: Route.product(id: product.id)) {
+                        ProductTile(product: product)
+                    }
+                    .buttonStyle(.plain)
                 }
             }
         }

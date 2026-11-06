@@ -1,7 +1,19 @@
 import { describe, expect, it, vi } from "vitest";
 import { CatalogueService } from "../../src/catalogue/CatalogueService.js";
+import { NotFoundError } from "../../src/domain/errors.js";
 import type { Logger } from "../../src/log.js";
 import { snapshotSource } from "../support/snapshot.js";
+
+describe("CatalogueService.product", () => {
+  it("returns the product", async () => {
+    const product = await new CatalogueService(snapshotSource(), []).product("3");
+    expect(product.title).toBe("Mens Cotton Jacket");
+  });
+
+  it("throws NotFoundError for an unknown ID", async () => {
+    await expect(new CatalogueService(snapshotSource(), []).product("999")).rejects.toBeInstanceOf(NotFoundError);
+  });
+});
 
 describe("CatalogueService.home", () => {
   it("returns the chosen products in config order, not rating order", async () => {

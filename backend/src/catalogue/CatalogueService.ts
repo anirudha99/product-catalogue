@@ -1,3 +1,4 @@
+import { NotFoundError } from "../domain/errors.js";
 import type { Category, Product } from "../domain/product.js";
 import { silentLogger, type Logger } from "../log.js";
 import type { ProductSource } from "../products/ProductSource.js";
@@ -18,6 +19,12 @@ export class CatalogueService {
   async home(): Promise<HomeView> {
     const [featured, categories] = await Promise.all([this.chosenProducts(), this.source.listCategories()]);
     return { featured, categories };
+  }
+
+  async product(id: string): Promise<Product> {
+    const product = await this.source.getProduct(id);
+    if (!product) throw new NotFoundError("Product not found.");
+    return product;
   }
 
   /** The chosen products that still exist, in config order. A missing ID is skipped, not fatal. */
