@@ -1,0 +1,29 @@
+# Secrets and local config
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+dist/
+coverage/
+*.log
+
+# Xcode
+xcuserdata/
+DerivedData/
+build/
+*.xcuserstate
+ios/Config/Local.xcconfig
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
+
+# Editor and agent local settings
+.vscode/
+.idea/
+.claude/settings.local.json
