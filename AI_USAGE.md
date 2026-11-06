@@ -18,7 +18,13 @@ Plan: [`PLAN.md`](PLAN.md). Written before any code, reviewed, then changed afte
 1. **Plan first, no code.** I gave the brief plus my stack choices (SwiftUI, Node + TypeScript, Mailpit, `docker compose up`), and asked for a plan covering: every gap in the acceptance criteria with an assumption and one alternative for me to choose, the architecture with swappable product source and mailer, the API contract, folder structure, iOS config, a test plan, security basics and cuts. Rule: "If a choice changes the design, ask me instead of guessing."
 2. **Asked it to judge its own plan.** "Are you designing this as a lead or staff engineer would?" It listed where the plan fell short: too long, no build order, contract written twice, nothing on the PR or the AI workflow, and an untested claim about Xcode 16. The plan was then rewritten.
 3. **Lead and staff-engineer review.** One agent wrote a brief as the lead. A second agent reviewed the plan as a staff engineer, with an order to disagree rather than approve, and to check claims instead of assuming. The lead checked the reviewer's facts, pushed back on three points, and the reviewer agreed with all three. The agreed result went into the plan.
-4. *(more to come during the build)*
+4. **Xcode project: created by hand, wired by a checked script.** I created the project in Xcode. The Xcode 26 template writes iOS 26.5, Swift 5 and main-actor-by-default straight into the project file, and those override any `.xcconfig`. Attaching the config files in the GUI would also have meant deleting each overriding setting by hand. So I let the AI make that one edit, under three conditions:
+   - Xcode closed first.
+   - A script that stops unless every change matches exactly once. It did stop once, on an ambiguous anchor, before writing anything.
+   - Proof afterwards: `plutil -lint`, the resolved build settings for both targets and both configurations, a full `xcodebuild test`, and a check of the built app's Info.plist.
+
+   CLAUDE.md was updated to allow this only under those conditions.
+5. *(more to come during the build)*
 
 ## Where the AI got it wrong, and how it was caught
 
@@ -31,6 +37,7 @@ Plan: [`PLAN.md`](PLAN.md). Written before any code, reviewed, then changed afte
 | 5 | The plan pinned Node only in Docker. Vitest 5 needs Node ≥ 22.12; this laptop has Node 20. | Staff review; I checked it with `npm view vitest engines`. |
 | 6 | The plan claimed Xcode 16 "should work" without testing it. | My own review, when asked to judge the plan. |
 | 7 | The product snapshot was planned under `test/fixtures/`, but snapshot mode needs it inside the runtime Docker image. | Me, while merging the review into the plan. |
+| 8 | The first `package.json` left out `vite`. Vitest 5 needs it as a peer dependency and does not install it. | The first `npm test` failed with "Cannot find package 'vite'"; confirmed with `npm view vitest@5.1.0 peerDependencies`. |
 
 ## Time log (raw; summary goes in the README)
 

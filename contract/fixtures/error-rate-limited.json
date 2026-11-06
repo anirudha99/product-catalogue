@@ -1,0 +1,7 @@
+{
+  "error": {
+    "code": "RATE_LIMITED",
+    "message": "Too many enquiries. Please try again later.",
+    "requestId": "00000000-0000-4000-8000-000000000001"
+  }
+}

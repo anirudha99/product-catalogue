@@ -1,0 +1,5 @@
+#include "Base.xcconfig"
+
+// Placeholder until a hosted API exists. HTTPS only; App Transport Security applies.
+API_SCHEME = https
+API_HOST = api.example.com

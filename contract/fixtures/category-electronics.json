@@ -1,0 +1,88 @@
+{
+  "category": {
+    "slug": "electronics",
+    "name": "Electronics"
+  },
+  "topRated": [
+    {
+      "id": "11",
+      "title": "Silicon Power 256GB SSD 3D NAND A55 SLC Cache Performance Boost SATA III 2.5",
+      "price": {
+        "amountMinor": 10900,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 4.8,
+        "count": 319
+      },
+      "imagePath": "/v1/products/11/image"
+    },
+    {
+      "id": "12",
+      "title": "WD 4TB Gaming Drive Works with Playstation 4 Portable External Hard Drive",
+      "price": {
+        "amountMinor": 11400,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 4.8,
+        "count": 400
+      },
+      "imagePath": "/v1/products/12/image"
+    }
+  ],
+  "more": [
+    {
+      "id": "9",
+      "title": "WD 2TB Elements Portable External Hard Drive - USB 3.0 ",
+      "price": {
+        "amountMinor": 6400,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 3.3,
+        "count": 203
+      },
+      "imagePath": "/v1/products/9/image"
+    },
+    {
+      "id": "10",
+      "title": "SanDisk SSD PLUS 1TB Internal SSD - SATA III 6 Gb/s",
+      "price": {
+        "amountMinor": 10900,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 2.9,
+        "count": 470
+      },
+      "imagePath": "/v1/products/10/image"
+    },
+    {
+      "id": "13",
+      "title": "Acer SB220Q bi 21.5 inches Full HD (1920 x 1080) IPS Ultra-Thin",
+      "price": {
+        "amountMinor": 59900,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 2.9,
+        "count": 250
+      },
+      "imagePath": "/v1/products/13/image"
+    },
+    {
+      "id": "14",
+      "title": "Samsung 49-Inch CHG90 144Hz Curved Gaming Monitor (LC49HG90DMNXZA) – Super Ultrawide Screen QLED ",
+      "price": {
+        "amountMinor": 99999,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 2.2,
+        "count": 140
+      },
+      "imagePath": "/v1/products/14/image"
+    }
+  ]
+}

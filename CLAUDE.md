@@ -20,7 +20,8 @@ The plan and every decision are in `PLAN.md`. Read it before changing anything. 
 ## Working rules
 
 - Every change comes with tests. Run `scripts/check.sh` and show the output before saying "done".
-- Never hand-edit `ios/Catalogue.xcodeproj/project.pbxproj`. Ask the human to make project changes in Xcode.
+- Don't hand-edit `ios/Catalogue.xcodeproj/project.pbxproj`. Prefer asking the human to make the change in Xcode. If an edit is unavoidable and the human agrees: Xcode must be closed; use a script that fails unless each change matches exactly once; then prove it with `plutil -lint`, `xcodebuild -showBuildSettings` and a full `xcodebuild test`.
+- Build settings live in `ios/Config/*.xcconfig`, not in the project file. Don't add settings to the project file that would override them.
 - No new npm dependencies without asking. No third-party iOS packages.
 - Validate all input on the backend with zod. Never trust the app or the upstream API.
 - No secrets in the repo. Config goes in `.env.example` with safe local defaults.

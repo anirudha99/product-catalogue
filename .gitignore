@@ -3,6 +3,9 @@
 .env.*
 !.env.example
 
+# Machine-specific compose settings (see docker-compose.override.example.yml)
+docker-compose.override.yml
+
 # Node
 node_modules/
 dist/
