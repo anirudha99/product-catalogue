@@ -1,6 +1,6 @@
 # PLAN — Product Catalogue PoC
 
-Status: **design closed, ready to implement** once the checklist in section 0 is done.
+Status: **implemented.** This is the plan as written before the build, kept as a record. Where the build differed from it: [DECISIONS.md](DECISIONS.md#where-the-build-differed-from-the-plan).
 
 Stack: SwiftUI iOS app · Node.js + TypeScript API · Fake Store API as the first product source · Mailpit for local email · `docker compose up` runs the backend.
 

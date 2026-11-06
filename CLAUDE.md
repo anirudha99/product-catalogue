@@ -23,7 +23,7 @@ The plan and every decision are in `PLAN.md`. Read it before changing anything. 
 - Don't hand-edit `ios/Catalogue.xcodeproj/project.pbxproj`. Prefer asking the human to make the change in Xcode. If an edit is unavoidable and the human agrees: Xcode must be closed; use a script that fails unless each change matches exactly once; then prove it with `plutil -lint`, `xcodebuild -showBuildSettings` and a full `xcodebuild test`.
 - Build settings live in `ios/Config/*.xcconfig`, not in the project file. Don't add settings to the project file that would override them.
 - No new npm dependencies without asking. No third-party iOS packages.
-- Validate all input on the backend with zod. Never trust the app or the upstream API.
+- Validate all input on the backend (zod schemas for bodies, config and upstream data; explicit checks for path and query values). Never trust the app or the upstream API.
 - No secrets in the repo. Config goes in `.env.example` with safe local defaults.
 - Never log customer names, emails, phone numbers or messages.
 - No commits, amends or pushes without an explicit "yes" from the human for that action.
@@ -37,6 +37,7 @@ The plan and every decision are in `PLAN.md`. Read it before changing anything. 
 | Run the backend + Mailpit | `docker compose up` |
 | Backend tests (Node ≥ 22.12) | `cd backend && npm test` |
 | Backend tests without local Node | `docker compose --profile test run --rm api-test` |
-| Everything (backend, iOS, boundaries) | `scripts/check.sh` |
+| Everything (formatting, backend, iOS, boundaries) | `scripts/check.sh` |
+| Format the code | `cd backend && npm run format` · `xcrun swift-format format -i -r ios/Catalogue ios/CatalogueTests` |
 | End-to-end check (stack must be up) | `scripts/smoke.sh` |
 | Mailpit inbox | http://localhost:8025 |
