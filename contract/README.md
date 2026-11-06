@@ -6,6 +6,17 @@ These JSON files **are** the API spec for `/v1`.
 - iOS tests decode every fixture into the app's real `Codable` types (`ios/CatalogueTests`).
 - If either side drifts from the contract, a test fails. A contract change must update the fixture in the same commit.
 
+## Where they come from
+
+[`generate_fixtures.py`](generate_fixtures.py) builds them from the product snapshot using the rules below. It is deliberately **separate from the backend code**: the backend tests then check the TypeScript against an independent implementation of the same rules.
+
+```bash
+python3 contract/generate_fixtures.py backend/data/fakestore-snapshot.json contract/fixtures
+git diff contract/fixtures   # empty = the contract is unchanged
+```
+
+Change a rule here and in the backend in the same commit, and say why in the message.
+
 ## Inputs that produce these exact files
 
 | Input | Value |
