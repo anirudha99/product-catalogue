@@ -11,6 +11,7 @@ enum Theme {
         static let accent = Color.accentColor
         static let rating = Color.orange
         static let error = Color.red
+        static let success = Color.green
         static let placeholder = Color(uiColor: .tertiaryLabel)
         /// Product photos have white backgrounds; keep them on white in dark mode too.
         static let imageBackground = Color.white
@@ -24,6 +25,7 @@ enum Theme {
         static let price = Font.headline
         static let body = Font.body
         static let caption = Font.caption
+        static let successIcon = Font.system(size: 64)
     }
 
     enum Spacing {

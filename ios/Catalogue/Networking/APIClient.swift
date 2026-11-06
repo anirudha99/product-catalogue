@@ -5,4 +5,5 @@ import Foundation
 protocol APIClient: Sendable {
     func home() async throws(APIError) -> HomeScreen
     func product(id: String) async throws(APIError) -> ProductDetail
+    func submitEnquiry(_ enquiry: EnquiryRequest) async throws(APIError) -> EnquiryReceipt
 }

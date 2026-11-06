@@ -18,6 +18,19 @@ final class LiveAPIClient: APIClient {
         try await get("/v1/products/\(id)")
     }
 
+    func submitEnquiry(_ enquiry: EnquiryRequest) async throws(APIError) -> EnquiryReceipt {
+        var request = URLRequest(url: baseURL.appending(path: "/v1/enquiries"), timeoutInterval: 20)
+        request.httpMethod = "POST"
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("application/json", forHTTPHeaderField: "Accept")
+        do {
+            request.httpBody = try JSONEncoder().encode(enquiry)
+        } catch {
+            throw .server
+        }
+        return try await send(request)
+    }
+
     // MARK: - Transport
 
     private func get<Response: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws(APIError) -> Response {

@@ -18,4 +18,12 @@ final class MockAPIClient: APIClient, @unchecked Sendable {
         productRequests.append(id)
         return try productResult.get()
     }
+
+    var enquiryResult: Result<EnquiryReceipt, APIError> = .failure(.server)
+    private(set) var enquiries: [EnquiryRequest] = []
+
+    func submitEnquiry(_ enquiry: EnquiryRequest) async throws(APIError) -> EnquiryReceipt {
+        enquiries.append(enquiry)
+        return try enquiryResult.get()
+    }
 }

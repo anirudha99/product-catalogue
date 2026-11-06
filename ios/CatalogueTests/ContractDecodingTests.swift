@@ -31,6 +31,17 @@ struct ContractDecodingTests {
         #expect(product.imagePath == "/v1/products/3/image")
     }
 
+    @Test func enquiryReceiptDecodes() throws {
+        let receipt = try Fixtures.decode(EnquiryReceipt.self, from: "enquiry-accepted.json")
+        #expect(receipt.reference == "00000000-0000-4000-8000-000000000001")
+    }
+
+    @Test func enquiryRequestLeavesOutMissingOptionalFields() throws {
+        let request = EnquiryRequest(productId: "3", name: "Ada", email: "ada@example.com", phone: nil, message: nil)
+        let json = try #require(try JSONSerialization.jsonObject(with: JSONEncoder().encode(request)) as? [String: String])
+        #expect(json == ["productId": "3", "name": "Ada", "email": "ada@example.com"])
+    }
+
     @Test(arguments: [
         ("error-validation.json", 400, APIError.validation(
             fields: ["name": "Enter your name.", "email": "Enter a valid email address."],

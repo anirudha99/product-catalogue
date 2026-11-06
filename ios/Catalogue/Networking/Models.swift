@@ -44,6 +44,26 @@ struct ProductDetail: Codable, Hashable, Sendable, Identifiable {
     let category: CategorySummary
 }
 
+extension ProductDetail {
+    var summary: ProductSummary {
+        ProductSummary(id: id, title: title, price: price, rating: rating, imagePath: imagePath)
+    }
+}
+
+/// POST /v1/enquiries body. Optional fields that are nil are left out of the JSON, not sent as "".
+struct EnquiryRequest: Codable, Hashable, Sendable {
+    let productId: String
+    let name: String
+    let email: String
+    let phone: String?
+    let message: String?
+}
+
+/// POST /v1/enquiries → 202
+struct EnquiryReceipt: Codable, Hashable, Sendable {
+    let reference: String
+}
+
 /// GET /v1/home
 struct HomeScreen: Codable, Hashable, Sendable {
     let featured: [ProductSummary]

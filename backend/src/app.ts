@@ -3,13 +3,16 @@ import { CatalogueService } from "./catalogue/CatalogueService.js";
 import type { Config } from "./config.js";
 import { errorHandler, notFoundRoute } from "./http/errorHandler.js";
 import { v1Routes } from "./http/routes.js";
+import { EnquiryService } from "./enquiries/EnquiryService.js";
 import type { Logger } from "./log.js";
+import type { Mailer } from "./mail/Mailer.js";
 import type { ProductSource } from "./products/ProductSource.js";
 
 export type AppDeps = {
   config: Config;
   logger: Logger;
   productSource: ProductSource;
+  mailer: Mailer;
   /** Used by the image proxy. Injected so tests never touch the network. */
   fetchImpl: typeof fetch;
   /** Makes request IDs (and later enquiry references). Injected so tests get fixed values. */
@@ -18,8 +21,9 @@ export type AppDeps = {
 
 /** Builds the Express app from its dependencies. Does no I/O, so tests can pass fakes. */
 export function buildApp(deps: AppDeps): Express {
-  const { config, logger, productSource, fetchImpl, newId } = deps;
+  const { config, logger, productSource, mailer, fetchImpl, newId } = deps;
   const catalogue = new CatalogueService(productSource, config.topRatedProductIds, logger);
+  const enquiries = new EnquiryService({ source: productSource, mailer, salesInbox: config.salesInbox, newId, logger });
 
   const app = express();
   app.disable("x-powered-by");
@@ -54,7 +58,14 @@ export function buildApp(deps: AppDeps): Express {
 
   app.use(
     "/v1",
-    v1Routes({ catalogue, source: productSource, fetchImpl, upstreamTimeoutMs: config.upstreamTimeoutMs }),
+    v1Routes({
+      catalogue,
+      enquiries,
+      source: productSource,
+      fetchImpl,
+      upstreamTimeoutMs: config.upstreamTimeoutMs,
+      enquiryRateLimit: config.enquiryRateLimit,
+    }),
   );
 
   app.use(notFoundRoute);

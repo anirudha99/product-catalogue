@@ -1,6 +1,7 @@
 import { buildApp, type AppDeps } from "../../src/app.js";
 import { loadConfig } from "../../src/config.js";
 import { silentLogger } from "../../src/log.js";
+import { FakeMailer } from "../fakes/FakeMailer.js";
 import { snapshotSource } from "./snapshot.js";
 
 /** Same fixed ID the contract fixtures use for requestId and enquiry references. */
@@ -21,6 +22,7 @@ export function testApp(overrides: Partial<AppDeps> = {}) {
     config: loadConfig({}),
     logger: silentLogger,
     productSource: snapshotSource(),
+    mailer: new FakeMailer(),
     fetchImpl: noNetwork,
     newId: () => FIXED_ID,
     ...overrides,

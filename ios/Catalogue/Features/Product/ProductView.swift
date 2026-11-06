@@ -2,8 +2,11 @@ import SwiftUI
 
 struct ProductView: View {
     @State private var model: ProductViewModel
+    @State private var enquiringAbout: ProductSummary?
+    private let api: any APIClient
 
     init(api: any APIClient, productID: String) {
+        self.api = api
         _model = State(initialValue: ProductViewModel(api: api, productID: productID))
     }
 
@@ -42,9 +45,26 @@ struct ProductView: View {
                 }
                 .padding(Theme.Spacing.l)
             }
+            .safeAreaInset(edge: .bottom) {
+                Button {
+                    enquiringAbout = product.summary
+                } label: {
+                    Text("Enquire")
+                        .bold()
+                        .frame(maxWidth: .infinity)
+                }
+                .buttonStyle(.borderedProminent)
+                .controlSize(.large)
+                .padding(Theme.Spacing.l)
+                .background(.bar)
+                .accessibilityIdentifier("enquire")
+            }
         }
         .background(Theme.Colors.background)
         .navigationBarTitleDisplayMode(.inline)
         .task { await model.load() }
+        .sheet(item: $enquiringAbout) { product in
+            EnquiryView(api: api, product: product)
+        }
     }
 }

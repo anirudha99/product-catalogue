@@ -44,6 +44,8 @@ Plan: [`PLAN.md`](PLAN.md). Written before any code, reviewed, then changed afte
 | 11 | `ProductTile` used a literal `Color.white`, breaking the "styling only from Theme" rule. | Re-reading the view; now `Theme.Colors.imageBackground`. |
 | 12 | The access log printed `/home` instead of `/v1/home` (Express shortens `req.path` inside a mounted router). | Reading the real logs during the simulator run. |
 | 13 | Xcode's template file headers carried the full macOS account name into the repo. | A search of files and history for the surname; a shared `IDETemplateMacros.plist` now makes new files' headers empty. |
+| 14 | The first enquiry view model mapped server field errors with a nested ternary and a dummy `_ = message`; it worked but was hard to read and easy to break. | Re-reading before writing its tests; rewritten as plain if/else, with a test for errors on fields the form doesn't have. |
+| 15 | The thank-you icon used `.font(.system(size:))` in the view, which breaks the "styling only from Theme" rule. | My own boundary grep for literal fonts; moved to `Theme.Fonts.successIcon`. |
 
 ## Time log (raw; summary goes in the README)
 
@@ -52,3 +54,5 @@ Plan: [`PLAN.md`](PLAN.md). Written before any code, reviewed, then changed afte
 | Planning + review | before 20:07 (first PLAN.md save) — exact start to confirm | 20:45 | Includes the staff-engineer review |
 | Setup (ready checklist) | 20:45 | 21:20 | Colima, Node 24, HTTPS-proxy certificate for Docker, Xcode project, xcconfig wiring |
 | Step 0: Home end to end | 21:20 | 21:45 | Backend adapter, cache, `/v1/home`, image proxy; iOS client, Theme, Home; run on simulator |
+| Step 1: Product page | 21:45 | 21:50 | Endpoint, screen, navigation; tapped through on the simulator |
+| Step 2: Enquiry | 21:50 | 21:58 | Validation, rate limit, SMTP mailer, smoke.sh; form + thank-you; real enquiry from the app arrived in Mailpit |

@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { buildApp } from "./app.js";
 import { ConfigError, loadConfig } from "./config.js";
 import { createLogger } from "./log.js";
+import { SmtpMailer } from "./mail/SmtpMailer.js";
 import { FakeStoreProductSource } from "./products/FakeStoreProductSource.js";
 import { fetchFromFakeStore, readSnapshot } from "./products/loaders.js";
 
@@ -27,7 +28,10 @@ function main(): void {
       : fetchFromFakeStore(config.fakeStoreBaseUrl, config.upstreamTimeoutMs);
   const productSource = new FakeStoreProductSource({ load, ttlMs: config.cacheTtlMs, logger });
 
-  const app = buildApp({ config, logger, productSource, fetchImpl: fetch, newId: randomUUID });
+  // The one place the email provider is chosen. SES via SMTP is config only; an HTTP API = a new Mailer class.
+  const mailer = new SmtpMailer({ ...config.smtp, from: config.mailFrom });
+
+  const app = buildApp({ config, logger, productSource, mailer, fetchImpl: fetch, newId: randomUUID });
 
   const server = app.listen(config.port, () => {
     logger.info("api listening", { port: config.port, productSource: config.productSource });
