@@ -64,6 +64,20 @@ struct EnquiryReceipt: Codable, Hashable, Sendable {
     let reference: String
 }
 
+/// GET /v1/categories/{slug}
+struct CategoryScreen: Codable, Hashable, Sendable {
+    let category: CategorySummary
+    /// The business's chosen top-rated products in this category. Can be empty.
+    let topRated: [ProductSummary]
+    let more: [ProductSummary]
+}
+
+/// GET /v1/search?q=
+struct SearchResults: Codable, Hashable, Sendable {
+    let term: String
+    let results: [ProductSummary]
+}
+
 /// GET /v1/home
 struct HomeScreen: Codable, Hashable, Sendable {
     let featured: [ProductSummary]

@@ -5,7 +5,7 @@ import type { ProductSource } from "../products/ProductSource.js";
 import { imageProxy } from "./imageProxy.js";
 import { enquiryRateLimit } from "./rateLimit.js";
 import { toCategoryResponse, toProductDetail, toProductSummary } from "./responses.js";
-import { parseEnquiry, parseProductId } from "./schemas.js";
+import { parseCategorySlug, parseEnquiry, parseProductId, parseSearchTerm } from "./schemas.js";
 
 export type RouteDeps = {
   catalogue: CatalogueService;
@@ -29,6 +29,21 @@ export function v1Routes(deps: RouteDeps): Router {
       featured: home.featured.map(toProductSummary),
       categories: home.categories.map(toCategoryResponse),
     });
+  });
+
+  router.get("/categories/:slug", async (req, res) => {
+    const view = await catalogue.category(parseCategorySlug(req.params.slug));
+    res.json({
+      category: toCategoryResponse(view.category),
+      topRated: view.topRated.map(toProductSummary),
+      more: view.more.map(toProductSummary),
+    });
+  });
+
+  router.get("/search", async (req, res) => {
+    const term = parseSearchTerm(req.query.q);
+    const results = await catalogue.search(term);
+    res.json({ term, results: results.map(toProductSummary) });
   });
 
   router.get("/products/:id", async (req, res) => {

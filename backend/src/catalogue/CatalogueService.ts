@@ -1,9 +1,10 @@
 import { NotFoundError } from "../domain/errors.js";
-import type { Category, Product } from "../domain/product.js";
+import { byRating, type Category, type Product } from "../domain/product.js";
 import { silentLogger, type Logger } from "../log.js";
 import type { ProductSource } from "../products/ProductSource.js";
 
 export type HomeView = { featured: Product[]; categories: Category[] };
+export type CategoryView = { category: Category; topRated: Product[]; more: Product[] };
 
 /**
  * Business rules for browsing. "Top rated" has one meaning everywhere: the products the business
@@ -19,6 +20,27 @@ export class CatalogueService {
   async home(): Promise<HomeView> {
     const [featured, categories] = await Promise.all([this.chosenProducts(), this.source.listCategories()]);
     return { featured, categories };
+  }
+
+  /**
+   * A category page: the chosen top-rated products that are in this category (config order),
+   * then every other product in it (by rating). No product appears twice. topRated may be empty.
+   */
+  async category(slug: string): Promise<CategoryView> {
+    const category = (await this.source.listCategories()).find((c) => c.slug === slug);
+    if (!category) throw new NotFoundError("Category not found.");
+
+    const inCategory = await this.source.listProducts({ categorySlug: slug });
+    const byId = new Map(inCategory.map((product) => [product.id, product]));
+    const topRated = this.topRatedIds.flatMap((id) => byId.get(id) ?? []);
+    const chosen = new Set(topRated.map((product) => product.id));
+    const more = inCategory.filter((product) => !chosen.has(product.id)).sort(byRating);
+    return { category, topRated, more };
+  }
+
+  /** Whole-catalogue search; best rated first. */
+  async search(term: string): Promise<Product[]> {
+    return (await this.source.listProducts({ text: term })).sort(byRating);
   }
 
   async product(id: string): Promise<Product> {

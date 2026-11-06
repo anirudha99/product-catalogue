@@ -14,6 +14,14 @@ final class LiveAPIClient: APIClient {
         try await get("/v1/home")
     }
 
+    func category(slug: String) async throws(APIError) -> CategoryScreen {
+        try await get("/v1/categories/\(slug)")
+    }
+
+    func search(term: String) async throws(APIError) -> SearchResults {
+        try await get("/v1/search", query: [URLQueryItem(name: "q", value: term)])
+    }
+
     func product(id: String) async throws(APIError) -> ProductDetail {
         try await get("/v1/products/\(id)")
     }

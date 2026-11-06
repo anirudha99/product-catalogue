@@ -22,6 +22,33 @@ struct ContractDecodingTests {
         #expect(jacket.imagePath == "/v1/products/3/image")
     }
 
+    @Test func categoryDecodes() throws {
+        let screen = try Fixtures.decode(CategoryScreen.self, from: "category-electronics.json")
+        #expect(screen.category == CategorySummary(slug: "electronics", name: "Electronics"))
+        #expect(screen.topRated.map(\.id) == ["11", "12"])
+        #expect(screen.more.map(\.id) == ["9", "10", "13", "14"])
+
+        let noPicks = try Fixtures.decode(CategoryScreen.self, from: "category-no-picks.json")
+        #expect(noPicks.topRated.isEmpty)
+    }
+
+    @Test func searchDecodes() throws {
+        let results = try Fixtures.decode(SearchResults.self, from: "search-jacket.json")
+        #expect(results.term == "jacket")
+        #expect(results.results.count == 4)
+        #expect(try Fixtures.decode(SearchResults.self, from: "search-no-results.json").results.isEmpty)
+    }
+
+    /// Every fixture is decoded by at least one test in this file; a new fixture must get one too.
+    @Test func everyFixtureIsCovered() throws {
+        let covered: Set<String> = [
+            "home.json", "category-electronics.json", "category-no-picks.json", "search-jacket.json",
+            "search-no-results.json", "product-3.json", "enquiry-accepted.json", "error-validation.json",
+            "error-not-found.json", "error-rate-limited.json", "error-upstream.json",
+        ]
+        #expect(Set(try Fixtures.allNames()) == covered)
+    }
+
     @Test func productDecodes() throws {
         let product = try Fixtures.decode(ProductDetail.self, from: "product-3.json")
 

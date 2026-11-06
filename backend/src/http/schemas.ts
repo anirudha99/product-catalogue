@@ -12,6 +12,22 @@ export function parseProductId(value: unknown): string {
   return result.data;
 }
 
+export function parseCategorySlug(value: unknown): string {
+  if (typeof value !== "string" || !/^[a-z0-9-]{1,50}$/.test(value)) {
+    throw new ValidationError({ slug: "Category is not valid." });
+  }
+  return value;
+}
+
+/** ?q= — one value, trimmed, 1–100 characters. Returned trimmed. */
+export function parseSearchTerm(value: unknown): string {
+  if (Array.isArray(value)) throw new ValidationError({ q: "Use one search term." });
+  const term = typeof value === "string" ? value.trim() : "";
+  if (term.length === 0) throw new ValidationError({ q: "Enter a search term." });
+  if (term.length > 100) throw new ValidationError({ q: "Search term must be 100 characters or fewer." });
+  return term;
+}
+
 // --- Enquiry body ---------------------------------------------------------
 
 /** Trims strings; an empty optional field counts as "not given". */

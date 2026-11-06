@@ -11,6 +11,22 @@ final class MockAPIClient: APIClient, @unchecked Sendable {
         return try homeResult.get()
     }
 
+    var categoryResult: Result<CategoryScreen, APIError> = .failure(.server)
+    private(set) var categoryRequests: [String] = []
+
+    func category(slug: String) async throws(APIError) -> CategoryScreen {
+        categoryRequests.append(slug)
+        return try categoryResult.get()
+    }
+
+    var searchResult: Result<SearchResults, APIError> = .failure(.server)
+    private(set) var searchRequests: [String] = []
+
+    func search(term: String) async throws(APIError) -> SearchResults {
+        searchRequests.append(term)
+        return try searchResult.get()
+    }
+
     var productResult: Result<ProductDetail, APIError> = .failure(.server)
     private(set) var productRequests: [String] = []
 
