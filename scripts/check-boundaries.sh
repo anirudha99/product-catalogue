@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Fails if code crosses a layer boundary (see CLAUDE.md). Scans tracked and new files; skips anything git-ignored.
+# Fails if code crosses a layer boundary (see README → Architecture). Scans tracked and new files; skips anything git-ignored.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 

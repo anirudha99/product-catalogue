@@ -1,4 +1,4 @@
-# One command for the reviewer: `docker compose up`
+# Backend + local mail inbox: `docker compose up`
 # Works with no .env file. To change a value, copy .env.example to .env and edit it.
 
 services:

@@ -1,4 +1,4 @@
-"""Derive contract fixtures from the Fake Store snapshot using PLAN.md rules.
+"""Derive contract fixtures from the Fake Store snapshot using the rules in contract/README.md.
 Independent of the backend code on purpose: the TS implementation is tested against this output.
 Usage (from the repo root): python3 contract/generate_fixtures.py backend/data/fakestore-snapshot.json contract/fixtures
 """
@@ -8,7 +8,7 @@ snap_path, out_dir = sys.argv[1], sys.argv[2]
 raw = json.load(open(snap_path))
 
 FIXED_ID = "00000000-0000-4000-8000-000000000001"
-CATS = {  # upstream -> (slug, display name)   PLAN.md section 11
+CATS = {  # upstream -> (slug, display name)
     "electronics": ("electronics", "Electronics"),
     "jewelery": ("jewellery", "Jewellery"),
     "men's clothing": ("mens-clothing", "Men's Clothing"),

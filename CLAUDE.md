@@ -1,7 +1,7 @@
 # CLAUDE.md — rules for AI agents in this repo
 
 Product catalogue proof of concept: SwiftUI iOS app → Node.js/TypeScript API → product source (Fake Store API today).
-The plan and every decision are in `PLAN.md`. Read it before changing anything. If a change goes against the plan, stop and ask.
+The design is in `docs/PLAN.md` and the decisions in `DECISIONS.md`. Read them before changing anything. If a change goes against the plan, stop and ask.
 
 ## Boundaries (enforced by `scripts/check-boundaries.sh`)
 

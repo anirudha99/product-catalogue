@@ -1,12 +1,12 @@
-# Product Catalogue — proof of concept
+# Product Catalogue
 
-A small product catalogue that is meant to grow into the real product. Customers browse featured products and categories, search, open a product, and send an enquiry that emails the sales inbox.
+A product catalogue, built as the first version of a product that will grow. Customers browse featured products and categories, search, open a product, and send an enquiry that emails the sales inbox.
 
 - **Client:** native iOS app, SwiftUI, no third-party packages.
 - **Backend:** Node.js + TypeScript API. It is the only thing that talks to the product source (Fake Store API today) and to the mail server.
 - **Email:** Mailpit, a local mail catcher, so no account or paid service is needed.
 
-Decisions and assumptions: [DECISIONS.md](DECISIONS.md) · How AI was used: [AI_USAGE.md](AI_USAGE.md) · Original plan: [PLAN.md](PLAN.md)
+Decisions: [DECISIONS.md](DECISIONS.md) · Design: [docs/PLAN.md](docs/PLAN.md) · AI usage: [AI_USAGE.md](AI_USAGE.md)
 
 ---
 
@@ -96,8 +96,8 @@ What the tests cover, along the critical path (home → category → search → 
 
 | Choice | Why |
 |---|---|
-| **Native iOS (SwiftUI)** | The brief allows web or mobile. A native app makes the client-side choices visible: per-build API config, no direct calls to the product source, and loading, empty and error states on every screen. SwiftUI + Observation keeps view models small and testable. No third-party packages: URLSession, Codable and AsyncImage cover a PoC. |
-| **Node.js + TypeScript** | Same language for request validation, config checks and upstream checks (zod). Express 5 is the most familiar choice for reviewers and handles async errors natively. |
+| **Native iOS (SwiftUI)** | Per-build API config, no direct calls to the product source, and loading, empty and error states on every screen. SwiftUI + Observation keeps view models small and testable. No third-party packages: URLSession, Codable and AsyncImage cover what's needed. |
+| **Node.js + TypeScript** | Same language for request validation, config checks and upstream checks (zod). Express 5 is widely known and handles async errors natively. |
 | **Mailpit** | A real SMTP server with a web inbox and an API: the email path is real (not a console log), and the smoke test can prove the email arrived. Swapping to SES is a config change (SES speaks SMTP). |
 | **Screen-shaped API** (`/v1/home`, `/v1/categories/{slug}`) | One request per screen, and business rules ("what is top rated?") live on the server, not in the app. A future web client reuses product, search and enquiry endpoints as they are; its own screens would get thin endpoints over the same services. |
 
@@ -179,22 +179,23 @@ The app's API address is in `ios/Config/Debug.xcconfig` (`API_HOST = localhost:3
 ## Repository layout
 
 ```
-backend/            Node + TypeScript API (src/, test/, data/fakestore-snapshot.json, Dockerfile)
-ios/                Xcode project: Catalogue/ (app), CatalogueTests/, Config/ (xcconfig + Info.plist)
-contract/fixtures/  The API contract, shared by backend and iOS tests
-scripts/            check.sh, check-boundaries.sh, smoke.sh
-CLAUDE.md           Rules the AI agent followed in this repo
+backend/     Node + TypeScript API: src/, test/, data/fakestore-snapshot.json, Dockerfile
+ios/         Xcode project: Catalogue/ (app), CatalogueTests/, Config/ (xcconfig + Info.plist)
+contract/    The API contract (fixtures/) and the script that generates it
+scripts/     check.sh, check-boundaries.sh, smoke.sh
+docs/        PLAN.md, the design written before implementation
+CLAUDE.md    Instructions for the AI coding agent
 ```
 
 ---
 
 ## Time spent
 
-About **3 hours 15 minutes** of wall-clock time, a little over the 2–3 hour time-box. Times come from commit times; the start is my estimate. Full log: [AI_USAGE.md](AI_USAGE.md#time-log).
+About **3 hours 15 minutes**, a little over the 2–3 hour time-box.
 
-| Part | Minutes | What |
+| Part | Time | What |
 |---|---|---|
-| Planning | ~60 | Plan, a review of it by a second AI agent, rework |
-| Building | ~82 | 35 min setup (Docker, an HTTPS-inspecting network, Xcode settings), then 47 min building the five steps with their tests |
-| Testing by hand | (~15, inside building) | Each step run on the simulator against the real stack |
-| Reviewing | ~53 | Docs and a fresh-copy check (13), then a final review by a second agent, the fixes it led to, and setting up formatters (40) |
+| Planning | ~1 h | The plan, an independent review of it, rework |
+| Building | ~1 h 20 min | Environment and project setup, then the five features with their tests |
+| Testing | ~15 min, within building | Each feature run on the simulator against the real backend |
+| Reviewing | ~55 min | Docs, a clean-copy run-through, an independent review of the repo and the fixes it led to, formatters |

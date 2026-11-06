@@ -41,7 +41,7 @@ Change a rule here and in the backend in the same commit, and say why in the mes
 | `error-rate-limited.json` | `POST /v1/enquiries` over the limit (429) |
 | `error-upstream.json` | Any catalogue request when the product source fails with no cached copy (502) |
 
-## Rules applied (from PLAN.md)
+## Rules applied
 
 - Titles and descriptions: leading and trailing spaces removed (upstream has some, e.g. "…Boat Neck V ").
 - Price: `Math.round(price * 100)` cents, currency `USD`.

@@ -13,7 +13,7 @@ export type EnquiryServiceOptions = {
 };
 
 /**
- * Sends an enquiry to the sales inbox. Not stored: the email is the record (a PoC decision; see DECISIONS.md).
+ * Sends an enquiry to the sales inbox. Not stored: the email is the record (for now; see DECISIONS.md).
  * If sending fails the caller gets EmailError and the customer is asked to try again.
  */
 export class EnquiryService {

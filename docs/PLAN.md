@@ -1,47 +1,31 @@
-# PLAN — Product Catalogue PoC
+# Plan
 
-Status: **implemented.** This is the plan as written before the build, kept as a record. Where the build differed from it: [DECISIONS.md](DECISIONS.md#where-the-build-differed-from-the-plan).
+Written before implementation; kept as the design record. Changes made since are listed in [DECISIONS.md](../DECISIONS.md#changes-from-the-original-plan).
 
 Stack: SwiftUI iOS app · Node.js + TypeScript API · Fake Store API as the first product source · Mailpit for local email · `docker compose up` runs the backend.
 
-Checked against the live Fake Store API on 2026-11-06:
+What the product source does (checked before planning):
 - 20 products in 4 categories: `electronics` (6), `women's clothing` (6), `men's clothing` (4), `jewelery` (4, misspelt upstream).
-- No search endpoint. We do search ourselves.
-- `GET /products/{unknown id}` returns **200 with an empty body**, not 404. So we never call `/products/{id}`.
-- Images are on `fakestoreapi.com/img/...`: `200 image/png`, about 270 KB, `cache-control: max-age=14400`. A bad image path returns `404 text/html`.
-
-How this plan was made: first draft by me (lead), then a review by a staff-engineer agent, then one round of pushback. Changes from that review are marked **(review)**.
+- No search endpoint, so the backend searches.
+- `GET /products/{unknown id}` returns **200 with an empty body**, not 404, so the backend never calls `/products/{id}`.
+- Images are on the source's own host (`200 image/png`, about 270 KB). A bad image path returns `404 text/html`.
 
 ---
 
-## 0. Definition of ready (before the first line of code)
-
-| # | Item | Done when |
-|---|---|---|
-| R1 | Toolchain on this Mac | Colima installed: `docker run hello-world` works, `docker compose version` prints. Node 24 active (`nvm use 24`). |
-| R2 | Xcode project | Created **in the Xcode GUI** (never hand-written `project.pbxproj`). `Base.xcconfig` attached with the settings in section 5. Empty app runs on the iOS 26.5 simulator. One Swift Testing test passes. |
-| R3 | Localhost spike | The empty app on the simulator GETs `http://localhost:3000/health` from a container, with only `NSAllowsLocalNetworking` set. |
-| R4 | Git | Repo initialised. `main` has a base commit (`.gitignore` only). Branch `feature/catalogue-poc` created. |
-| R5 | Snapshot | `backend/data/fakestore-snapshot.json` committed. Fetch date in the commit message. |
-| R6 | Contract fixtures | `contract/fixtures/*.json` produced from the snapshot by a separate script (not the backend code) and reviewed **before** any handler exists (section 3). They are the spec; code is written to match them. |
-| R7 | Agent + log files | `CLAUDE.md` committed (section 10). `AI_USAGE.md` started with the planning prompt and the review's catches. Time log started with a timestamp. |
-
----
-
-## 1. Gaps in the acceptance criteria
+## Gaps in the acceptance criteria
 
 ### Decided
 
 | # | Gap | Decision | Alternative not taken |
 |---|---|---|---|
-| G1 | What is "top rated"? **(review)** | **One meaning everywhere: the set of products the entrepreneur chose.** Config `TOP_RATED_PRODUCT_IDS=3,5,11,12,18` (all 4.6★ or more, and every category has at least one). Home shows all of them, in config order. | Compute "top rated" from star ratings. Rejected: the AC says "I have **chosen**", and mixing the two would put a 2.2★ product under "top rated". |
-| G4 | Top rated on a category page **(review)** | The chosen products that are in this category, in config order. If none, the section is hidden and only "more" shows. | Fill up with highest-rated products. Rejected: brings back two meanings. |
+| G1 | What is "top rated"? | **One meaning everywhere: the set of products the entrepreneur chose.** Config `TOP_RATED_PRODUCT_IDS=3,5,11,12,18` (all 4.6★ or more, and every category has at least one). Home shows all of them, in config order. | Compute "top rated" from star ratings. Rejected: the AC says "I have **chosen**", and mixing the two would put a 2.2★ product under "top rated". |
+| G4 | Top rated on a category page | The chosen products that are in this category, in config order. If none, the section is hidden and only "more" shows. | Fill up with highest-rated products. Rejected: brings back two meanings. |
 | G5 | "Additional products" | Every other product in the category, no repeats. | Repeat the top-rated ones too. |
 | G12 | Images on fakestoreapi.com | Our API proxies them (`GET /v1/products/{id}/image`). The backend uses the stored URL only. | Send the Fake Store URL to the app. |
 | G15 | Products per enquiry | One, started from the product page. | Enquiry basket. |
 | G17/18 | Store enquiries? Email fails? | Email only. On failure the API returns an error, the app keeps the form, no "Thank you". | Save first, then email with retries. |
 
-### Search **(review)**
+### Search
 
 | # | Gap | Decision | Alternative |
 |---|---|---|---|
@@ -54,7 +38,7 @@ How this plan was made: first draft by me (lead), then a review by a staff-engin
 
 - **G2 Home:** chosen products, category list, search field.
 - **G6 Category links:** a list on Home.
-- **G7 Category names:** slug + display name owned by the adapter (section 11).
+- **G7 Category names:** slug + display name owned by the adapter (see Implementation spec).
 - **G13 Product page:** image, title, price, category, rating, description, Enquire button.
 - **G14 Currency:** USD, sent as cents + `"USD"`.
 - **G16 Contact details:** name and email required; phone and message optional.
@@ -63,15 +47,15 @@ How this plan was made: first draft by me (lead), then a review by a staff-engin
 - **G21 Sales inbox:** `SALES_INBOX` env var, never from the request.
 - **G22 Accounts:** none.
 - **G23 Paging:** none (20 products).
-- **G24 Fake Store down:** cache, serve stale, 502 on a cold failure. Plus `PRODUCT_SOURCE=snapshot` to run on the committed snapshot **(review)**.
-- **G25 Devices:** iPhone, portrait. Light and dark mode through system colours. System text styles. Landscape and large Dynamic Type sizes are not tested, so not claimed **(review)**.
+- **G24 Fake Store down:** cache, serve stale, 502 on a cold failure. Plus `PRODUCT_SOURCE=snapshot` to run on the committed snapshot.
+- **G25 Devices:** iPhone, portrait. Light and dark mode through system colours. System text styles. Landscape and large Dynamic Type sizes are not tested, so not claimed.
 - **G26 Language:** English only.
 
 These move into DECISIONS.md at the end.
 
 ---
 
-## 2. Architecture
+## Architecture
 
 ```
 iOS app ──JSON──▶ Our API (/v1) ──▶ ProductSource ──▶ Fake Store API  (or the committed snapshot)
@@ -79,7 +63,7 @@ iOS app ──JSON──▶ Our API (/v1) ──▶ ProductSource ──▶ Fake
                          └────────▶ Mailer ──SMTP──▶ Mailpit (local) / SES (later)
 ```
 
-Rule: each arrow is the only way across that line. `scripts/check-boundaries.sh` enforces it (section 10).
+Rule: each arrow is the only way across that line. `scripts/check-boundaries.sh` enforces it.
 
 ### Backend
 
@@ -117,7 +101,7 @@ interface Mailer {
 }
 ```
 
-`query` stays on the interface so a future source (Postgres, a search service) can search itself. Fake Store cannot, so its adapter calls the pure `domain/search.ts → matchesTerm(product, term)`. Any later source without native search reuses that same function. **(review)**
+`query` stays on the interface so a future source (Postgres, a search service) can search itself. Fake Store cannot, so its adapter calls the pure `domain/search.ts → matchesTerm(product, term)`. Any later source without native search reuses that same function.
 
 | Interface | Implementation | Notes |
 |---|---|---|
@@ -126,7 +110,7 @@ interface Mailer {
 | `Mailer` | `SmtpMailer` (nodemailer) | Mailpit locally; SES SMTP later. |
 | `Mailer` | `FakeMailer` (tests only) | Records messages; can be told to fail. |
 
-`InMemoryProductSource` is **removed (review)**. API tests use the real `FakeStoreProductSource` with a loader that returns the snapshot. So they test the real mapping, cache and search, not a second copy.
+API tests use the real `FakeStoreProductSource` with a loader that returns the snapshot, so they test the real mapping, cache and search, not a test double.
 
 Wiring: `app.ts` exports `buildApp({ productSource, mailer, config, newId, logger })` and does no I/O. `server.ts` reads env, builds the real parts, calls `buildApp`. Tests pass fakes and a fixed `newId`.
 
@@ -139,10 +123,10 @@ View ──▶ ViewModel (@MainActor @Observable) ──▶ APIClient protocol �
 
 - Views call view models only. View models get an `APIClient` in `init`. `CatalogueApp` builds `LiveAPIClient` and passes it down.
 - One `NavigationStack`, `Route` = `.category(slug)`, `.search(term)`, `.product(id)`. Enquiry is a sheet.
-- Screen state: `LoadState<Value>` = `loading | loaded(Value) | empty | failed(APIError)`. (No `idle` — every screen loads on appear.) **(review)**
+- Screen state: `LoadState<Value>` = `loading | loaded(Value) | empty | failed(APIError)`. (No `idle` — every screen loads on appear.)
 - Enquiry state: `editing | submitting | submitted(reference) | failed(APIError)`.
 - `RemoteImage` wraps `AsyncImage`, loads from our API only, shows a `photo` SF Symbol on failure. It is the one deliberate place a view touches the network.
-- `URLCache.shared = URLCache(memoryCapacity: 20_000_000, diskCapacity: 100_000_000)` at app start, so 270 KB images are cached. **(review)**
+- `URLCache.shared = URLCache(memoryCapacity: 20_000_000, diskCapacity: 100_000_000)` at app start, so 270 KB images are cached.
 - No third-party packages.
 
 ```swift
@@ -155,7 +139,7 @@ protocol APIClient: Sendable {
 }
 ```
 
-### Why the API is shaped by screen **(review)**
+### Why the API is shaped by screen
 
 `/v1/home` and `/v1/categories/{slug}` return what one screen needs in one call (a backend-for-frontend). This keeps the app thin, keeps business rules (what "top rated" means) on the server, and means one round trip per screen. Cost: a web client with different screens needs new endpoints. Those are thin, because the rules live in the services, not the routes. `/v1/products/{id}`, `/v1/search` and `/v1/enquiries` are reusable as they are.
 
@@ -172,9 +156,9 @@ protocol APIClient: Sendable {
 
 ---
 
-## 3. API contract (v1)
+## API contract (v1)
 
-The spec is the files in `contract/fixtures/`. They are written by hand first (R6). Backend API tests check each response **equals** its fixture. iOS tests decode the same files into the app's real types.
+The spec is the files in `contract/fixtures/`. They are produced from the snapshot by `contract/generate_fixtures.py`, separately from the backend code. Backend API tests check each response **equals** its fixture. iOS tests decode the same files into the app's real types.
 
 ```jsonc
 // ProductSummary
@@ -223,17 +207,17 @@ Fixtures are deterministic: tests build the app with `TOP_RATED_PRODUCT_IDS=3,5,
 
 ---
 
-## 4. Folder structure
+## Folder structure
 
 ```
 product-catalogue/
-├── README.md  DECISIONS.md  AI_USAGE.md  PLAN.md  CLAUDE.md
+├── README.md  DECISIONS.md  AI_USAGE.md  CLAUDE.md  docs/PLAN.md
 ├── docker-compose.yml            # api + mailpit; api-test under the "test" profile
 ├── .env.example  .gitignore
 ├── contract/fixtures/*.json      # the API spec; shared by backend and iOS tests
 ├── scripts/
 │   ├── check.sh                  # backend tests → iOS tests → boundary check
-│   ├── check-boundaries.sh       # git grep allowlist (section 10)
+│   ├── check-boundaries.sh       # layer rules, checked with git grep
 │   └── smoke.sh                  # needs the stack up: home → enquiry → Mailpit
 ├── backend/
 │   ├── Dockerfile                # stages: deps → build → test → runtime (non-root)
@@ -271,15 +255,15 @@ product-catalogue/
 
 ---
 
-## 5. iOS details
+## iOS details
 
 | Topic | Plan |
 |---|---|
 | Xcode | Tested with Xcode 26.6 and the iOS 26.5 simulator. The README claims only this. |
-| `Base.xcconfig` **(review)** | `IPHONEOS_DEPLOYMENT_TARGET = 17.0`, `SWIFT_VERSION = 6`, `SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated`, `SWIFT_APPROACHABLE_CONCURRENCY = YES`. Xcode 26 new projects default to MainActor isolation and a 26.x target, so these are set on purpose. View models are marked `@MainActor` by hand. |
+| `Base.xcconfig` | `IPHONEOS_DEPLOYMENT_TARGET = 17.0`, `SWIFT_VERSION = 6`, `SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated`, `SWIFT_APPROACHABLE_CONCURRENCY = YES`. Xcode 26 new projects default to MainActor isolation and a 26.x target, so these are set on purpose. View models are marked `@MainActor` by hand. |
 | Minimum iOS | 17 (for `@Observable`). |
 | Signing | Simulator only; no Apple account needed. |
-| Base URL **(review)** | `Debug.xcconfig`: `API_SCHEME = http`, `API_HOST = localhost:3000`. `Info.plist`: `APIBaseURL = $(API_SCHEME)://$(API_HOST)`. No `//` in the xcconfig, so no comment trick needed. `AppConfig` reads it at launch and stops with a clear message if it is missing or bad. |
+| Base URL | `Debug.xcconfig`: `API_SCHEME = http`, `API_HOST = localhost:3000`. `Info.plist`: `APIBaseURL = $(API_SCHEME)://$(API_HOST)`. No `//` in the xcconfig, so no comment trick needed. `AppConfig` reads it at launch and stops with a clear message if it is missing or bad. |
 | ATS | Only `NSAllowsLocalNetworking = YES`. Checked (Apple docs): it covers unqualified names like `localhost`, `.local` names and IP addresses. No arbitrary loads. |
 | Fixtures in tests | `Fixtures.swift` finds `contract/fixtures` from `#filePath`. Works because simulator tests can read the Mac's files. No bundling. |
 
@@ -303,13 +287,13 @@ product-catalogue/
 | `.server` | 500 / other | "Something went wrong. Please try again." |
 | `.decoding` | Bad JSON | Same as `.server`; logged |
 
-`APIError.from(status:body:)` is a pure function, so it is tested without stubbing `URLSession`. **(review)**
+`APIError.from(status:body:)` is a pure function, so it is tested without stubbing `URLSession`.
 
 Before sending, the app checks only that name and email are filled in, trims every field, and leaves out empty optional fields. The backend does the real validation.
 
 ---
 
-## 6. Test plan (home → product → enquiry → category → search)
+## Test plan (home → product → enquiry → category → search)
 
 ### Backend — Vitest + Supertest
 
@@ -340,11 +324,11 @@ Run: ⌘U in Xcode, or `scripts/check.sh`.
 
 ### End to end
 
-`scripts/smoke.sh` (stack must be up): GET `/health`, GET `/v1/home`, POST an enquiry, then read Mailpit `GET http://localhost:8025/api/v1/messages` and check the reference is there. Takes under a minute. Also the interview demo. **(review)**
+`scripts/smoke.sh` (stack must be up): GET `/health`, GET `/v1/home`, POST an enquiry, then read Mailpit `GET http://localhost:8025/api/v1/messages` and check the reference is there. Takes under a minute.
 
 ---
 
-## 7. Security basics
+## Security basics
 
 | Area | Plan |
 |---|---|
@@ -362,49 +346,23 @@ Run: ⌘U in Xcode, or `scripts/check.sh`.
 
 ---
 
-## 8. Cuts
-
-### Cut now
+## Cuts
 
 | Cut | Why it is safe |
 |---|---|
 | Enquiry storage, queue, retries | Email meets the AC; 202 leaves room for a queue. |
 | Admin for top-rated products | Config meets "I have chosen"; admin needs auth. |
 | OpenAPI spec | The shared fixtures pin the contract. Next-day item. |
-| `InMemoryProductSource` | Tests use the real adapter with the snapshot. |
+| A separate in-memory product source for tests | Tests use the real adapter with the snapshot. |
 | UI test, `URLProtocol` client tests | Pure `APIError.from` + view-model + contract tests cover the logic. |
 | Customer confirmation email | Not in the AC; abuse risk. |
 | Paging, iPad, landscape, localisation | Not needed to firm up the vision. |
 | CI, infrastructure as code | `scripts/check.sh` runs everything. The image fits ECS Fargate / App Runner; SES has SMTP. |
 | Real brand styling | Creative work is in progress; `Theme.swift` holds the tokens. |
 
-### If behind at 2h30 with the enquiry screen not done, cut in this order **(review)**
+## Build order
 
-1. Category and Search view-model tests.
-2. Per-field error mapping on iOS (show all `fields` messages as one list).
-3. 429-specific copy.
-4. `scripts/check-boundaries.sh` (do the greps by hand and log them).
-
-**Never cut:** backend enquiry tests, the Thank-you screen, one success and one failure `EnquiryViewModel` test, `smoke.sh`, the fresh-clone README check. Each cut goes into DECISIONS.md when it is made.
-
-### Time budget **(review)**
-
-| Part | Min |
-|---|---|
-| Planning + review (already spent; real number goes in the README) | ~45 |
-| Ready checklist: Colima, Node 24, Xcode project, git, snapshot, fixtures | 25 |
-| Step 0: thin slice end to end | 35 |
-| Step 1: product page | 20 |
-| Step 2: enquiry + smoke.sh | 45 |
-| Step 3: category + search | 30 |
-| Step 4: docs, check.sh, fresh-clone check, PR | 35 |
-| **Total** | **~3h55m.** Over the time-box. This is said plainly in the README and PR. |
-
----
-
-## 9. Build order **(review)**
-
-Risk first, then the most-demoed AC, then the screens that are "just more lists".
+Riskiest integration first, then the most important flow (enquiry), then the screens that are "just more lists".
 
 | Step | Goal | Done when |
 |---|---|---|
@@ -412,58 +370,11 @@ Risk first, then the most-demoed AC, then the screens that are "just more lists"
 | 1. Product | Product page | API + view-model tests pass; tap a tile → details |
 | 2. Enquiry | The full enquiry AC | Backend + view-model tests pass; `smoke.sh` passes; email visible in Mailpit at `localhost:8025`; Thank you on the simulator |
 | 3. Category + Search | Remaining AC | Tests pass; reuse `ProductTile` and `LoadStateView` |
-| 4. Finish | Docs and proof | `scripts/check.sh` green; fresh clone → README → working app in under 10 min; PR open |
+| 4. Finish | Docs and proof | `scripts/check.sh` green; fresh clone → README → working app in under 10 min |
 
 ---
 
-## 10. PR, commits and AI workflow
-
-### Git
-
-- `main`: one base commit (`.gitignore` only) so the PR shows the whole build.
-- Branch `feature/catalogue-poc`, one commit per build step:
-
-1. `docs: add plan and agent rules`
-2. `chore: snapshot, contract fixtures, project skeletons`
-3. `feat: home end to end (API, image proxy, iOS)`
-4. `feat: product page`
-5. `feat: enquiry with validation, rate limit, email and smoke test`
-6. `feat: category and search`
-7. `docs: README, DECISIONS, AI_USAGE, time spent`
-
-The PR description is drafted with the agent and edited by me. Outline: what and how to run (3 steps) · choices and why · architecture + swap table · key decisions (G1, G9, G12, G15, G17/18) · cuts · tests (commands, counts) · AI usage summary · time spent · known limits.
-
-### CLAUDE.md rules (committed)
-
-- Layer rules from section 2. Fake Store only in `products/`; SMTP only in `SmtpMailer`; `URLSession` only in `LiveAPIClient` (plus the `URLCache` line in `CatalogueApp`).
-- `contract/fixtures` are the spec. A contract change updates the fixture in the same change, and the reason goes in the commit message.
-- Never hand-edit `project.pbxproj`. Ask me to do project changes in Xcode.
-- No new dependencies without asking. No third-party iOS packages.
-- Every change has tests. Run `scripts/check.sh` and show the output before saying "done".
-- No secrets. No commits or pushes without my explicit yes.
-
-### Boundary check
-
-`scripts/check-boundaries.sh` uses `git grep --untracked` (new files are checked too, while anything in `.gitignore`, like `node_modules` and build output, is skipped) with an allowlist. It exits non-zero on any match outside it:
-
-| Text | Allowed only in |
-|---|---|
-| `fakestoreapi` | `FakeStoreProductSource.ts`, `loaders.ts`, `config.ts`, `.env.example`, `docker-compose.yml`, `backend/data/fakestore-snapshot.json` |
-| `nodemailer` | `SmtpMailer.ts`, `package.json`, `package-lock.json` |
-| `URLSession` | `LiveAPIClient.swift`, `CatalogueApp.swift` |
-
-`scripts/check.sh` runs backend tests, then iOS tests (`xcodebuild test` on the first available iPhone simulator), then the boundary check.
-
-### Review checkpoints, after every step
-
-- The diff is reviewed before each commit.
-- `scripts/check.sh` is green. From step 2 on, `smoke.sh` is green too.
-- Prompts that shape the solution are pasted into AI_USAGE.md when sent.
-- Each AI mistake gets one line (what, how caught) right away. Already logged from planning: Vitest needs Node ≥ 22.12; substring search was wrong; "top rated" had two meanings; Fake Store answers unknown IDs with an empty 200; snapshot file was under `test/`, so it would not be in the runtime image.
-
----
-
-## 11. Implementation spec
+## Implementation spec
 
 ### Environment variables (validated with zod at startup; fail fast)
 
@@ -539,9 +450,8 @@ Buffered, not streamed. No server-side image cache (the client caches).
 
 | Tool | Choice | Why |
 |---|---|---|
-| Docker runtime | Colima | Free and open source. Docker Desktop/OrbStack also work. |
-| Node | 24 LTS (`node:24-alpine`, `.nvmrc`, `engines >=22.12`) | Current LTS. Vitest 5 needs ≥22.12 (checked on npm). Local Node 20.11 is too old. |
-| HTTP | Express 5 | Best known. Checked: async errors go to the error handler. |
+| Node | 24 LTS (`node:24-alpine`, `.nvmrc`, `engines >=22.12`) | Current LTS. Vitest 5 needs ≥ 22.12. |
+| HTTP | Express 5 | Best known; async errors reach the error handler. |
 | Validation | zod | Requests, env and upstream data. |
 | Email | nodemailer | SMTP; works with Mailpit and SES. |
 | Rate limit | express-rate-limit | Standard, small. |
