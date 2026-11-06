@@ -24,7 +24,8 @@ Plan: [`PLAN.md`](PLAN.md). Written before any code, reviewed, then changed afte
    - Proof afterwards: `plutil -lint`, the resolved build settings for both targets and both configurations, a full `xcodebuild test`, and a check of the built app's Info.plist.
 
    CLAUDE.md was updated to allow this only under those conditions.
-5. *(more to come during the build)*
+5. **The contract fixtures earned their place on the first run.** I had the fixtures generated from the snapshot by a separate script, not by the backend code. The first `/v1/home` test failed: the adapter trimmed a stray trailing space from upstream titles ("…Boat Neck V "), and the fixtures didn't. Trimming is right, so it became a written contract rule (`contract/README.md`) and the fixtures were regenerated: a deliberate contract change, not a fixture edited to make a test pass.
+6. *(more to come during the build)*
 
 ## Where the AI got it wrong, and how it was caught
 
@@ -38,9 +39,16 @@ Plan: [`PLAN.md`](PLAN.md). Written before any code, reviewed, then changed afte
 | 6 | The plan claimed Xcode 16 "should work" without testing it. | My own review, when asked to judge the plan. |
 | 7 | The product snapshot was planned under `test/fixtures/`, but snapshot mode needs it inside the runtime Docker image. | Me, while merging the review into the plan. |
 | 8 | The first `package.json` left out `vite`. Vitest 5 needs it as a peer dependency and does not install it. | The first `npm test` failed with "Cannot find package 'vite'"; confirmed with `npm view vitest@5.1.0 peerDependencies`. |
+| 9 | A `git mv` into a folder that didn't exist yet renamed the asset catalog itself to `Resources`, so it lost its `.xcassets` name. | Listing the folder tree straight after the move. |
+| 10 | The fallback title-casing for unknown categories used `\b`, which would turn "men's" into "Men'S". | Re-reading the adapter before writing its tests; now covered by a test. |
+| 11 | `ProductTile` used a literal `Color.white`, breaking the "styling only from Theme" rule. | Re-reading the view; now `Theme.Colors.imageBackground`. |
+| 12 | The access log printed `/home` instead of `/v1/home` (Express shortens `req.path` inside a mounted router). | Reading the real logs during the simulator run. |
+| 13 | Xcode's template file headers carried the full macOS account name into the repo. | A search of files and history for the surname; a shared `IDETemplateMacros.plist` now makes new files' headers empty. |
 
 ## Time log (raw; summary goes in the README)
 
 | Phase | From | To | Notes |
 |---|---|---|---|
 | Planning + review | before 20:07 (first PLAN.md save) — exact start to confirm | 20:45 | Includes the staff-engineer review |
+| Setup (ready checklist) | 20:45 | 21:20 | Colima, Node 24, HTTPS-proxy certificate for Docker, Xcode project, xcconfig wiring |
+| Step 0: Home end to end | 21:20 | 21:45 | Backend adapter, cache, `/v1/home`, image proxy; iOS client, Theme, Home; run on simulator |

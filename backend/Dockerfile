@@ -19,6 +19,8 @@ RUN npm run build
 # `docker compose --profile test run --rm api-test` runs the tests with no local Node needed.
 FROM deps AS test
 COPY . .
+# API tests compare responses with the contract fixtures in <repo>/contract (named build context).
+COPY --from=contract . /contract
 CMD ["npm", "test"]
 
 FROM node:24-alpine AS runtime

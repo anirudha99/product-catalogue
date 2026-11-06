@@ -45,3 +45,5 @@ services:
     build:
       context: ./backend
       target: test
+      additional_contexts:
+        contract: ./contract

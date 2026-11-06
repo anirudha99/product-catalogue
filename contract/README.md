@@ -32,6 +32,7 @@ These JSON files **are** the API spec for `/v1`.
 
 ## Rules applied (from PLAN.md)
 
+- Titles and descriptions: leading and trailing spaces removed (upstream has some, e.g. "…Boat Neck V ").
 - Price: `Math.round(price * 100)` cents, currency `USD`.
 - `featured` and `topRated`: the chosen IDs in config order. `topRated` keeps only those in the category.
 - `more` and search `results`: rating average desc, then rating count desc, then ID asc.

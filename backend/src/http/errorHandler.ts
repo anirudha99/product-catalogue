@@ -27,6 +27,8 @@ export function sendError(
   message: string,
   fields?: Record<string, string>,
 ): void {
+  // Errors are never cacheable: a failed image or a 502 must not stick in the app's URL cache.
+  res.setHeader("Cache-Control", "no-store");
   res.status(status).json({
     error: {
       code,
