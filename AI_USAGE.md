@@ -1,0 +1,39 @@
+# AI usage
+
+Working draft. Updated as the build goes, not written at the end.
+
+## Tools and models
+
+| Tool | Model | Used for |
+|---|---|---|
+| Claude Code (VS Code extension) | Claude Opus 5.5 (`claude-opus-5-5`) | Planning, review, code, tests, docs |
+| Claude Code subagent, briefed as a "staff engineer" reviewer | same model | Independent review of the plan before any code |
+
+Agent instruction file: [`CLAUDE.md`](CLAUDE.md), committed. It holds the layer boundaries, the contract rule and the working rules the agent must follow.
+
+Plan: [`PLAN.md`](PLAN.md). Written before any code, reviewed, then changed after the review.
+
+## How I directed the AI
+
+1. **Plan first, no code.** I gave the brief plus my stack choices (SwiftUI, Node + TypeScript, Mailpit, `docker compose up`), and asked for a plan covering: every gap in the acceptance criteria with an assumption and one alternative for me to choose, the architecture with swappable product source and mailer, the API contract, folder structure, iOS config, a test plan, security basics and cuts. Rule: "If a choice changes the design, ask me instead of guessing."
+2. **Asked it to judge its own plan.** "Are you designing this as a lead or staff engineer would?" It listed where the plan fell short: too long, no build order, contract written twice, nothing on the PR or the AI workflow, and an untested claim about Xcode 16. The plan was then rewritten.
+3. **Lead and staff-engineer review.** One agent wrote a brief as the lead. A second agent reviewed the plan as a staff engineer, with an order to disagree rather than approve, and to check claims instead of assuming. The lead checked the reviewer's facts, pushed back on three points, and the reviewer agreed with all three. The agreed result went into the plan.
+4. *(more to come during the build)*
+
+## Where the AI got it wrong, and how it was caught
+
+| # | What was wrong | How it was caught |
+|---|---|---|
+| 1 | "Top rated" had two meanings: hand-picked on Home, computed from stars on category pages. The default picks put a 2.2★ product on Home as "top rated". | Staff review; I then checked the ratings in the live data. |
+| 2 | Search used plain substring matching. "men" matched 13 of 20 products, including women's items. | Staff review; I re-ran the query on the data (word-start matching gives exactly the 4 men's items). |
+| 3 | API tests would have used a separate in-memory product source with its own copy of the search logic, so they tested a copy, not the shipping code. | Staff review. |
+| 4 | The plan assumed Fake Store returns 404 for an unknown product. It returns 200 with an empty body. | Staff review; I checked it with `curl`. |
+| 5 | The plan pinned Node only in Docker. Vitest 5 needs Node ≥ 22.12; this laptop has Node 20. | Staff review; I checked it with `npm view vitest engines`. |
+| 6 | The plan claimed Xcode 16 "should work" without testing it. | My own review, when asked to judge the plan. |
+| 7 | The product snapshot was planned under `test/fixtures/`, but snapshot mode needs it inside the runtime Docker image. | Me, while merging the review into the plan. |
+
+## Time log (raw; summary goes in the README)
+
+| Phase | From | To | Notes |
+|---|---|---|---|
+| Planning + review | before 20:07 (first PLAN.md save) — exact start to confirm | 20:45 | Includes the staff-engineer review |
