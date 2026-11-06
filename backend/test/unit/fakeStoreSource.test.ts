@@ -125,6 +125,23 @@ describe("FakeStoreProductSource cache", () => {
     expect(load).toHaveBeenCalledTimes(3);
   });
 
+  it("does not let an empty upstream list wipe a good cached catalogue", async () => {
+    let now = 0;
+    let upstream: unknown[] = snapshotRaw();
+    const source = snapshotSource({ load: async () => upstream, ttlMs: 1000, now: () => now });
+
+    await source.listProducts();
+    upstream = [];
+    now = 5000;
+
+    expect(await source.listProducts()).toHaveLength(20);
+  });
+
+  it("treats an empty upstream list as a failure when nothing is cached", async () => {
+    const source = snapshotSource({ load: async () => [] });
+    await expect(source.listProducts()).rejects.toBeInstanceOf(UpstreamError);
+  });
+
   it("fails with UpstreamError when there is no cached copy", async () => {
     const source = snapshotSource({ load: async () => Promise.reject(new Error("ECONNRESET")) });
     await expect(source.listProducts()).rejects.toBeInstanceOf(UpstreamError);

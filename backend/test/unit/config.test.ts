@@ -18,6 +18,10 @@ describe("loadConfig", () => {
     expect(config.topRatedProductIds).toEqual(["7", "2", "9"]);
   });
 
+  it("rejects a product chosen twice, so no product appears twice on Home", () => {
+    expect(() => loadConfig({ TOP_RATED_PRODUCT_IDS: "3,5,3" })).toThrow(/each ID may appear only once/);
+  });
+
   it("treats empty strings as unset", () => {
     const config = loadConfig({ SMTP_USER: "", PORT: "" });
     expect(config.smtp.user).toBeUndefined();

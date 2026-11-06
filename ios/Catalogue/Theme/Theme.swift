@@ -13,6 +13,8 @@ enum Theme {
         static let error = Color.red
         static let success = Color.green
         static let placeholder = Color(uiColor: .tertiaryLabel)
+        /// Behind the bottom action bar (Enquire): the system bar material, so content scrolls under it.
+        static let actionBar: Material = .bar
         /// Product photos have white backgrounds; keep them on white in dark mode too.
         static let imageBackground = Color.white
     }
@@ -26,6 +28,7 @@ enum Theme {
         static let body = Font.body
         static let caption = Font.caption
         static let successIcon = Font.system(size: 64)
+        static let placeholderIcon = Font.largeTitle
     }
 
     enum Spacing {

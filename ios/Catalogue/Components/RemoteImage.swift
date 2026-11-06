@@ -14,7 +14,7 @@ struct RemoteImage: View {
                 image.resizable().scaledToFit()
             case .failure:
                 Image(systemName: "photo")
-                    .font(.largeTitle)
+                    .font(Theme.Fonts.placeholderIcon)
                     .foregroundStyle(Theme.Colors.placeholder)
                     .accessibilityLabel("Image unavailable")
             default:

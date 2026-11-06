@@ -28,6 +28,12 @@ struct APIErrorTests {
         #expect(APIError.from(status: 429, body: noBody, retryAfter: "soon") == .rateLimited(retryAfterSeconds: nil))
     }
 
+    @Test func rateLimitCopyUsesRetryAfter() {
+        #expect(APIError.rateLimited(retryAfterSeconds: 900).userMessage == "Too many enquiries. Please try again in about 15 minutes.")
+        #expect(APIError.rateLimited(retryAfterSeconds: 30).userMessage == "Too many enquiries. Please try again in about 1 minute.")
+        #expect(APIError.rateLimited(retryAfterSeconds: nil).userMessage == "Too many enquiries. Please try again later.")
+    }
+
     @Test func everyUserFacingErrorHasCopy() {
         let errors: [APIError] = [.transport, .validation(fields: [:], message: ""), .notFound,
                                   .rateLimited(retryAfterSeconds: nil), .upstream, .server, .decoding]

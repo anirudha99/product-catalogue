@@ -25,7 +25,11 @@ struct EnquiryView: View {
                 if case .submitted = model.phase {
                     ToolbarItem(placement: .confirmationAction) { Button("Done") { dismiss() } }
                 } else {
-                    ToolbarItem(placement: .cancellationAction) { Button("Cancel") { dismiss() } }
+                    // Disabled while sending: closing mid-send would hide whether the enquiry went out.
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Cancel") { dismiss() }
+                            .disabled(model.phase == .submitting)
+                    }
                 }
             }
         }

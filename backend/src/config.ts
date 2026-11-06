@@ -8,7 +8,12 @@ const productIdList = z
       .map((id) => id.trim())
       .filter((id) => id.length > 0),
   )
-  .pipe(z.array(z.string().regex(/^[A-Za-z0-9_-]{1,64}$/, "each ID must be 1-64 letters, digits, - or _")).min(1));
+  .pipe(
+    z
+      .array(z.string().regex(/^[A-Za-z0-9_-]{1,64}$/, "each ID must be 1-64 letters, digits, - or _"))
+      .min(1)
+      .refine((ids) => new Set(ids).size === ids.length, "each ID may appear only once"),
+  );
 
 const booleanString = z.enum(["true", "false"]).transform((value) => value === "true");
 

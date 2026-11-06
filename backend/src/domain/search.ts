@@ -5,8 +5,9 @@ import type { Product } from "./product.js";
  * or the source's category label. Case-insensitive; the whole trimmed phrase must match.
  *
  * "Start of a word" = start of the text, or right after a character that is not a letter or digit.
- * So "men" matches "Men's Clothing" but not "women" or "garments". A plain \b is not used because
- * it fails for terms that begin with punctuation.
+ * So "men" matches "Men's Clothing" but not "women" or "garments". A plain \b is not used: it only
+ * knows ASCII letters, and it needs a word character next to it, so a term that itself starts with
+ * punctuation, like "(lc49", would never match. Terms that start mid-word (e.g. "'s") don't match, by design.
  *
  * Pure function: any product source without native search can reuse it.
  */

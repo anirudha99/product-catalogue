@@ -40,6 +40,14 @@ describe("matchesTerm", () => {
     expect(ids("  ssd  ")).toEqual([10, 11]);
   });
 
+  it("matches a term that starts with punctuation, at the start of a word", () => {
+    expect(ids("(lc49")).toEqual([14]);
+  });
+
+  it("does not match a term that starts in the middle of a word", () => {
+    expect(ids("'s")).toEqual([]);
+  });
+
   it("treats regex characters literally", () => {
     expect(() => ids("$(")).not.toThrow();
     expect(ids("$(")).toEqual([]);

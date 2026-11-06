@@ -115,7 +115,8 @@ export class FakeStoreProductSource implements ProductSource {
         this.logger.warn("skipping invalid upstream product", { issues: parsed.error.issues.length });
       }
     }
-    if (raw.length > 0 && products.length === 0) throw new UpstreamError("Fake Store returned no valid products");
+    // An empty list is treated as a failure, so a glitch upstream can't replace a good cached catalogue with nothing.
+    if (products.length === 0) throw new UpstreamError("Fake Store returned no valid products");
     return products;
   }
 }

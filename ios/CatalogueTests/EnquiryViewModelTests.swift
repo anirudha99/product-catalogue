@@ -66,7 +66,7 @@ struct EnquiryViewModelTests {
     }
 
     @Test(arguments: [
-        (APIError.rateLimited(retryAfterSeconds: 60), "Too many enquiries. Please try again later."),
+        (APIError.rateLimited(retryAfterSeconds: 60), "Too many enquiries. Please try again in about 1 minute."),
         (.upstream, "We couldn't send your enquiry. Please try again."),
         (.notFound, "This product is no longer available."),
     ])
@@ -82,14 +82,22 @@ struct EnquiryViewModelTests {
     }
 
     @Test func aSecondTapWhileSendingIsIgnored() async {
+        // The mock holds the first request open, so the second tap really happens mid-flight.
+        let gate = Gate()
+        api.enquiryGate = gate
         api.enquiryResult = .success(EnquiryReceipt(reference: "ref-1"))
         let model = filledModel()
 
-        async let first: Void = model.submit()
-        async let second: Void = model.submit()
-        _ = await (first, second)
+        let first = Task { await model.submit() }
+        while !gate.isWaiting { await Task.yield() }
+        #expect(model.phase == .submitting)
+
+        await model.submit() // second tap while the first is still sending
 
         #expect(api.enquiries.count == 1)
+        gate.open()
+        await first.value
+        #expect(model.phase == .submitted(reference: "ref-1"))
     }
 
     @Test func retryingAfterAFailureClearsTheOldError() async {

@@ -2,10 +2,11 @@
 # Symptom: "certificate signed by unknown authority" during the build or when the API calls Fake Store.
 #
 #   cp docker-compose.override.example.yml docker-compose.override.yml
-#   export EXTRA_CA_BUNDLE=/path/to/your/proxy-root-or-bundle.pem
+#   echo "EXTRA_CA_BUNDLE=/path/to/your/proxy-root-or-bundle.pem" >> .env
 #   docker compose up --build
 #
-# docker compose picks up docker-compose.override.yml automatically. It is git-ignored.
+# docker compose picks up docker-compose.override.yml and .env automatically. Both are git-ignored.
+# Putting the path in .env (not `export`) means it still works in a new terminal and for scripts/check.sh.
 
 services:
   api:

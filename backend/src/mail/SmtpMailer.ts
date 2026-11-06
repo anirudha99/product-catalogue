@@ -22,9 +22,11 @@ export class SmtpMailer implements Mailer {
       port: options.port,
       secure: options.secure,
       ...(options.user ? { auth: { user: options.user, pass: options.pass ?? "" } } : {}),
-      connectionTimeout: 10_000,
-      greetingTimeout: 10_000,
-      socketTimeout: 15_000,
+      // Worst case 5 + 5 + 10 s, plus up to 5 s for the product lookup: still inside the app's 30 s enquiry timeout,
+      // so the app never gives up on a request that then succeeds (which would invite a duplicate enquiry).
+      connectionTimeout: 5_000,
+      greetingTimeout: 5_000,
+      socketTimeout: 10_000,
     });
   }
 

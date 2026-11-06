@@ -49,8 +49,11 @@ enum APIError: Error, Equatable, Sendable {
             return message.isEmpty ? "Some fields need attention." : message
         case .notFound:
             return "We couldn't find that."
-        case .rateLimited:
-            return "Too many enquiries. Please try again later."
+        case .rateLimited(let seconds):
+            // Uses the server's Retry-After when it sent one.
+            guard let seconds, seconds > 0 else { return "Too many enquiries. Please try again later." }
+            let minutes = Int((Double(seconds) / 60).rounded(.up))
+            return "Too many enquiries. Please try again in about \(minutes) minute\(minutes == 1 ? "" : "s")."
         case .upstream:
             return "We couldn't load products right now. Please try again."
         case .server, .decoding:

@@ -27,7 +27,9 @@ final class LiveAPIClient: APIClient {
     }
 
     func submitEnquiry(_ enquiry: EnquiryRequest) async throws(APIError) -> EnquiryReceipt {
-        var request = URLRequest(url: baseURL.appending(path: "/v1/enquiries"), timeoutInterval: 20)
+        // Longer than the server's worst case (product lookup + SMTP timeouts ≈ 25 s), so the app never gives up
+        // on an enquiry that then gets sent, which would lead the customer to send it again.
+        var request = URLRequest(url: baseURL.appending(path: "/v1/enquiries"), timeoutInterval: 30)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("application/json", forHTTPHeaderField: "Accept")

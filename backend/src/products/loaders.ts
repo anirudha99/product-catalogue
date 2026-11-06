@@ -17,7 +17,7 @@ export function fetchFromFakeStore(baseUrl: string, timeoutMs: number, fetchImpl
         signal: AbortSignal.timeout(timeoutMs),
       });
     } catch (err) {
-      throw new UpstreamError(`Fake Store request failed: ${err instanceof Error ? err.message : String(err)}`);
+      throw new UpstreamError(`Fake Store request failed: ${describe(err)}`);
     }
     if (!res.ok) {
       throw new UpstreamError(`Fake Store returned HTTP ${res.status}`);
@@ -30,7 +30,19 @@ export function fetchFromFakeStore(baseUrl: string, timeoutMs: number, fetchImpl
   };
 }
 
-/** Loads the committed snapshot instead (PRODUCT_SOURCE=snapshot): works offline. */
+/**
+ * fetch() reports most network failures as just "fetch failed"; the useful part (e.g. a certificate
+ * error behind an HTTPS-inspecting proxy, or ECONNREFUSED) is in `cause`. Include its code in the log.
+ */
+function describe(err: unknown): string {
+  if (!(err instanceof Error)) return String(err);
+  const cause = err.cause as { code?: unknown; message?: unknown } | undefined;
+  const code = typeof cause?.code === "string" ? cause.code : undefined;
+  if (err.name === "TimeoutError") return "timed out";
+  return code ? `${err.message} (${code})` : err.message;
+}
+
+/** Loads the committed snapshot instead (PRODUCT_SOURCE=snapshot): no network needed for product data (images still are). */
 export function readSnapshot(path: string): RawLoader {
   return async () => {
     try {

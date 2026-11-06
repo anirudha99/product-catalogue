@@ -28,11 +28,18 @@ export function imageProxy({ source, fetchImpl, timeoutMs, maxBytes }: ImageProx
       throw imageError(`image request failed: ${err instanceof Error ? err.message : String(err)}`);
     }
     const contentType = upstream.headers.get("content-type") ?? "";
-    if (!upstream.ok) throw imageError(`image host returned HTTP ${upstream.status}`);
-    if (!/^image\/[\w.+-]+/i.test(contentType)) throw imageError(`image host returned ${contentType || "no content type"}`);
-
     const declared = Number(upstream.headers.get("content-length"));
-    if (Number.isFinite(declared) && declared > maxBytes) throw imageError(`image is ${declared} bytes`);
+    const problem = !upstream.ok
+      ? `image host returned HTTP ${upstream.status}`
+      : !ALLOWED_IMAGE_TYPE.test(contentType)
+        ? `image host returned ${contentType || "no content type"}`
+        : Number.isFinite(declared) && declared > maxBytes
+          ? `image is ${declared} bytes`
+          : undefined;
+    if (problem) {
+      await upstream.body?.cancel(); // don't leave the rejected download open
+      throw imageError(problem);
+    }
     const body = await readCapped(upstream, maxBytes);
 
     res.setHeader("Content-Type", contentType);
@@ -41,6 +48,9 @@ export function imageProxy({ source, fetchImpl, timeoutMs, maxBytes }: ImageProx
     res.send(body);
   };
 }
+
+/** Raster images only. SVG is refused: it can carry script, which matters once a web client exists. */
+const ALLOWED_IMAGE_TYPE = /^image\/(png|jpeg|webp|gif)(;|$)/i;
 
 function imageError(reason: string): UpstreamError {
   return new UpstreamError(reason);

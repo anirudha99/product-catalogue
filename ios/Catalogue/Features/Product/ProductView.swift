@@ -56,7 +56,7 @@ struct ProductView: View {
                 .buttonStyle(.borderedProminent)
                 .controlSize(.large)
                 .padding(Theme.Spacing.l)
-                .background(.bar)
+                .background(Theme.Colors.actionBar)
                 .accessibilityIdentifier("enquire")
             }
         }

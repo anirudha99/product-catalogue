@@ -68,6 +68,10 @@ export function errorHandler(logger: Logger): ErrorRequestHandler {
     if (isHttpError(err) && err.type === "entity.parse.failed") {
       return sendError(res, 400, "VALIDATION_FAILED", "Request body must be valid JSON.");
     }
+    // Any other client-side body problem (unsupported encoding or charset, aborted upload, …) is the client's error, not a 500.
+    if (isHttpError(err) && err.status >= 400 && err.status < 500) {
+      return sendError(res, 400, "VALIDATION_FAILED", "Request body could not be read.");
+    }
 
     logger.error("unhandled error", { requestId, error: err instanceof Error ? err.stack : String(err) });
     return sendError(res, 500, "INTERNAL", "Something went wrong. Please try again.");
@@ -75,5 +79,10 @@ export function errorHandler(logger: Logger): ErrorRequestHandler {
 }
 
 function isHttpError(err: unknown): err is { type: string; status: number } {
-  return typeof err === "object" && err !== null && "type" in err && typeof (err as { type: unknown }).type === "string";
+  return (
+    typeof err === "object" &&
+    err !== null &&
+    typeof (err as { type?: unknown }).type === "string" &&
+    typeof (err as { status?: unknown }).status === "number"
+  );
 }
