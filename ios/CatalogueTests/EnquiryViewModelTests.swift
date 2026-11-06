@@ -1,4 +1,5 @@
 import Testing
+
 @testable import Catalogue
 
 @MainActor
@@ -38,7 +39,10 @@ struct EnquiryViewModelTests {
 
         await model.submit()
 
-        #expect(api.enquiries == [EnquiryRequest(productId: "3", name: "Ada Lovelace", email: "ada@example.com", phone: nil, message: nil)])
+        #expect(
+            api.enquiries == [
+                EnquiryRequest(productId: "3", name: "Ada Lovelace", email: "ada@example.com", phone: nil, message: nil)
+            ])
     }
 
     @Test func successShowsThankYouWithTheReference() async {
@@ -52,10 +56,11 @@ struct EnquiryViewModelTests {
     }
 
     @Test func serverValidationLandsOnTheRightFields() async {
-        api.enquiryResult = .failure(.validation(
-            fields: ["email": "Enter a valid email address.", "productId": "Product ID is not valid."],
-            message: "Some fields need attention."
-        ))
+        api.enquiryResult = .failure(
+            .validation(
+                fields: ["email": "Enter a valid email address.", "productId": "Product ID is not valid."],
+                message: "Some fields need attention."
+            ))
         let model = filledModel()
 
         await model.submit()
@@ -78,7 +83,7 @@ struct EnquiryViewModelTests {
 
         #expect(model.phase == .editing)
         #expect(model.formError == message)
-        #expect(model.name == "Ada Lovelace") // nothing the user typed is lost
+        #expect(model.name == "Ada Lovelace")  // nothing the user typed is lost
     }
 
     @Test func aSecondTapWhileSendingIsIgnored() async {
@@ -92,7 +97,7 @@ struct EnquiryViewModelTests {
         while !gate.isWaiting { await Task.yield() }
         #expect(model.phase == .submitting)
 
-        await model.submit() // second tap while the first is still sending
+        await model.submit()  // second tap while the first is still sending
 
         #expect(api.enquiries.count == 1)
         gate.open()

@@ -19,7 +19,10 @@ function appWithMailer(env: Record<string, string> = {}) {
   return { mailer, app };
 }
 
-const post = (app: ReturnType<typeof testApp>, body: unknown) => request(app).post("/v1/enquiries").send(body as object);
+const post = (app: ReturnType<typeof testApp>, body: unknown) =>
+  request(app)
+    .post("/v1/enquiries")
+    .send(body as object);
 
 describe("POST /v1/enquiries", () => {
   it("accepts a valid enquiry with 202, matches the contract, and emails sales once", async () => {
@@ -55,10 +58,20 @@ describe("POST /v1/enquiries", () => {
   it.each([
     ["a blank name", { name: "   " }, "name", "Enter your name."],
     ["a name over 100 characters", { name: "a".repeat(101) }, "name", "Name must be 100 characters or fewer."],
-    ["a line break in the name (header injection)", { name: "Ada\r\nBcc: x@evil.test" }, "name", "Name contains characters that aren't allowed."],
+    [
+      "a line break in the name (header injection)",
+      { name: "Ada\r\nBcc: x@evil.test" },
+      "name",
+      "Name contains characters that aren't allowed.",
+    ],
     ["an email over 254 characters", { email: `${"a".repeat(250)}@x.io` }, "email", "Enter a valid email address."],
     ["letters in the phone", { phone: "call me" }, "phone", "Enter a valid phone number (digits, spaces, + ( ) -)."],
-    ["a message over 1000 characters", { message: "m".repeat(1001) }, "message", "Message must be 1000 characters or fewer."],
+    [
+      "a message over 1000 characters",
+      { message: "m".repeat(1001) },
+      "message",
+      "Message must be 1000 characters or fewer.",
+    ],
     ["a non-string message", { message: 42 }, "message", "Enter a message as text."],
     ["a malformed product ID", { productId: "../3" }, "productId", "Product ID is not valid."],
     ["an unknown field", { price: 0.01 }, "price", "Unknown field."],
@@ -109,7 +122,10 @@ describe("POST /v1/enquiries", () => {
     const res = await post(app, valid);
 
     expect(res.status).toBe(502);
-    expect(res.body.error).toMatchObject({ code: "EMAIL_FAILED", message: "We couldn't send your enquiry. Please try again." });
+    expect(res.body.error).toMatchObject({
+      code: "EMAIL_FAILED",
+      message: "We couldn't send your enquiry. Please try again.",
+    });
   });
 
   it("rate-limits per client: the contract's 429 with Retry-After once the limit is hit", async () => {

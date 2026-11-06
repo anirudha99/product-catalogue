@@ -4,10 +4,10 @@ import Foundation
 /// Found via this file's path on the Mac; simulator test processes can read it, so nothing is bundled.
 enum Fixtures {
     static let directory: URL = URL(filePath: #filePath)
-        .deletingLastPathComponent() // Support
-        .deletingLastPathComponent() // CatalogueTests
-        .deletingLastPathComponent() // ios
-        .deletingLastPathComponent() // repo root
+        .deletingLastPathComponent()  // Support
+        .deletingLastPathComponent()  // CatalogueTests
+        .deletingLastPathComponent()  // ios
+        .deletingLastPathComponent()  // repo root
         .appending(path: "contract/fixtures")
 
     static func data(_ name: String) throws -> Data {

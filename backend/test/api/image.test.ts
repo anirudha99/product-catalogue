@@ -54,11 +54,26 @@ describe("GET /v1/products/:id/image", () => {
   });
 
   it.each([
-    ["the image host returns 404 HTML", () => new Response("<h1>Not found</h1>", { status: 404, headers: { "content-type": "text/html" } })],
-    ["the image host returns 200 but not an image", () => new Response("<html>", { headers: { "content-type": "text/html" } })],
-    ["the image is an SVG (it can carry script)", () => new Response("<svg/>", { headers: { "content-type": "image/svg+xml" } })],
-    ["the declared size is over 5 MB", () => new Response(PNG, { headers: { "content-type": "image/png", "content-length": String(6 * 1024 * 1024) } })],
-    ["the streamed size is over 5 MB", () => new Response(new Uint8Array(5 * 1024 * 1024 + 1), { headers: { "content-type": "image/png" } })],
+    [
+      "the image host returns 404 HTML",
+      () => new Response("<h1>Not found</h1>", { status: 404, headers: { "content-type": "text/html" } }),
+    ],
+    [
+      "the image host returns 200 but not an image",
+      () => new Response("<html>", { headers: { "content-type": "text/html" } }),
+    ],
+    [
+      "the image is an SVG (it can carry script)",
+      () => new Response("<svg/>", { headers: { "content-type": "image/svg+xml" } }),
+    ],
+    [
+      "the declared size is over 5 MB",
+      () => new Response(PNG, { headers: { "content-type": "image/png", "content-length": String(6 * 1024 * 1024) } }),
+    ],
+    [
+      "the streamed size is over 5 MB",
+      () => new Response(new Uint8Array(5 * 1024 * 1024 + 1), { headers: { "content-type": "image/png" } }),
+    ],
   ])("returns 502 with no-store when %s", async (_case, response) => {
     const res = await request(testApp({ fetchImpl: fakeFetch(response) })).get("/v1/products/3/image");
 

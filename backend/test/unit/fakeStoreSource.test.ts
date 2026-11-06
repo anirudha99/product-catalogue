@@ -36,7 +36,11 @@ describe("FakeStoreProductSource mapping", () => {
   it("derives slug and name for an unknown category", async () => {
     const source = snapshotSource({ load: async () => [rawProduct({ category: "home & garden's best" })] });
     const product = await source.getProduct("99");
-    expect(product?.category).toEqual({ slug: "home-gardens-best", name: "Home & Garden's Best", sourceName: "home & garden's best" });
+    expect(product?.category).toEqual({
+      slug: "home-gardens-best",
+      name: "Home & Garden's Best",
+      sourceName: "home & garden's best",
+    });
   });
 
   it("rounds prices to whole cents", async () => {
@@ -50,7 +54,12 @@ describe("FakeStoreProductSource mapping", () => {
 
   it("lists categories once each, sorted by name", async () => {
     const categories = await snapshotSource().listCategories();
-    expect(categories.map((category) => category.slug)).toEqual(["electronics", "jewellery", "mens-clothing", "womens-clothing"]);
+    expect(categories.map((category) => category.slug)).toEqual([
+      "electronics",
+      "jewellery",
+      "mens-clothing",
+      "womens-clothing",
+    ]);
   });
 
   it("filters by category and text together", async () => {
@@ -66,7 +75,9 @@ describe("FakeStoreProductSource upstream checks", () => {
   });
 
   it("skips invalid records but keeps the valid ones", async () => {
-    const source = snapshotSource({ load: async () => [rawProduct(), rawProduct({ id: "not-a-number" }), { junk: true }] });
+    const source = snapshotSource({
+      load: async () => [rawProduct(), rawProduct({ id: "not-a-number" }), { junk: true }],
+    });
     expect((await source.listProducts()).map((product) => product.id)).toEqual(["99"]);
   });
 

@@ -110,7 +110,9 @@ struct EnquiryView: View {
     }
 
     /// A text field with its error message (if any) underneath.
-    private func field<Input: View>(_ field: EnquiryViewModel.Field, _ label: String, @ViewBuilder input: () -> Input) -> some View {
+    private func field<Input: View>(_ field: EnquiryViewModel.Field, _ label: String, @ViewBuilder input: () -> Input)
+        -> some View
+    {
         VStack(alignment: .leading, spacing: Theme.Spacing.xs) {
             input()
                 .focused($focused, equals: field)
@@ -132,10 +134,12 @@ struct EnquiryView: View {
                 .accessibilityHidden(true)
             Text("Thank you")
                 .font(Theme.Fonts.productTitle)
-            Text("We've sent your enquiry about \(model.product.title). Our sales team will reply to \(model.email.trimmingCharacters(in: .whitespaces)).")
-                .font(Theme.Fonts.body)
-                .foregroundStyle(Theme.Colors.textSecondary)
-                .multilineTextAlignment(.center)
+            Text(
+                "We've sent your enquiry about \(model.product.title). Our sales team will reply to \(model.email.trimmingCharacters(in: .whitespaces))."
+            )
+            .font(Theme.Fonts.body)
+            .foregroundStyle(Theme.Colors.textSecondary)
+            .multilineTextAlignment(.center)
             if case .submitted(let reference) = model.phase {
                 Text("Reference \(reference.prefix(8))")
                     .font(Theme.Fonts.caption)

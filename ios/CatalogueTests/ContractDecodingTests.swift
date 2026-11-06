@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import Catalogue
 
 /// The app's Codable types must decode the shared contract fixtures. If the backend and app drift, this fails.
@@ -65,15 +66,19 @@ struct ContractDecodingTests {
 
     @Test func enquiryRequestLeavesOutMissingOptionalFields() throws {
         let request = EnquiryRequest(productId: "3", name: "Ada", email: "ada@example.com", phone: nil, message: nil)
-        let json = try #require(try JSONSerialization.jsonObject(with: JSONEncoder().encode(request)) as? [String: String])
+        let json = try #require(
+            try JSONSerialization.jsonObject(with: JSONEncoder().encode(request)) as? [String: String])
         #expect(json == ["productId": "3", "name": "Ada", "email": "ada@example.com"])
     }
 
     @Test(arguments: [
-        ("error-validation.json", 400, APIError.validation(
-            fields: ["name": "Enter your name.", "email": "Enter a valid email address."],
-            message: "Some fields need attention."
-        )),
+        (
+            "error-validation.json", 400,
+            APIError.validation(
+                fields: ["name": "Enter your name.", "email": "Enter a valid email address."],
+                message: "Some fields need attention."
+            )
+        ),
         ("error-not-found.json", 404, .notFound),
         ("error-rate-limited.json", 429, .rateLimited(retryAfterSeconds: 900)),
         ("error-upstream.json", 502, .upstream),

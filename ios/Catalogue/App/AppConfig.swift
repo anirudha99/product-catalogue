@@ -20,7 +20,9 @@ struct AppConfig: Sendable {
     static func fromMainBundle() -> AppConfig {
         let info = Bundle.main.infoDictionary ?? [:]
         guard let config = AppConfig(infoDictionary: info) else {
-            fatalError("APIBaseURL is missing or invalid (got \(String(describing: info["APIBaseURL"]))). Set API_SCHEME and API_HOST in ios/Config/*.xcconfig.")
+            fatalError(
+                "APIBaseURL is missing or invalid (got \(String(describing: info["APIBaseURL"]))). Set API_SCHEME and API_HOST in ios/Config/*.xcconfig."
+            )
         }
         return config
     }

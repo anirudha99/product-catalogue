@@ -37,6 +37,8 @@ struct RatingLabel: View {
         }
         .font(Theme.Fonts.caption)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("Rated \(rating.average.formatted(.number.precision(.fractionLength(1)))) out of 5, \(rating.count) reviews")
+        .accessibilityLabel(
+            "Rated \(rating.average.formatted(.number.precision(.fractionLength(1)))) out of 5, \(rating.count) reviews"
+        )
     }
 }

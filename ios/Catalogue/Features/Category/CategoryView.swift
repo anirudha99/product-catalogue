@@ -21,7 +21,8 @@ struct CategoryView: View {
                         section("Top rated", screen.topRated)
                     }
                     if !screen.more.isEmpty {
-                        section(screen.topRated.isEmpty ? "All products" : "More in \(screen.category.name)", screen.more)
+                        section(
+                            screen.topRated.isEmpty ? "All products" : "More in \(screen.category.name)", screen.more)
                     }
                 }
                 .padding(Theme.Spacing.l)

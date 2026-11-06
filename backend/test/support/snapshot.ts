@@ -1,6 +1,9 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
-import { FakeStoreProductSource, type FakeStoreProductSourceOptions } from "../../src/products/FakeStoreProductSource.js";
+import {
+  FakeStoreProductSource,
+  type FakeStoreProductSourceOptions,
+} from "../../src/products/FakeStoreProductSource.js";
 
 const SNAPSHOT_PATH = fileURLToPath(new URL("../../data/fakestore-snapshot.json", import.meta.url));
 

@@ -143,6 +143,9 @@ function toCategory(sourceName: string): Category {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
   // Capitalise after spaces only, so "men's" becomes "Men's", not "Men'S".
-  const name = sourceName.replace(/(^|\s)(\p{L})/gu, (_match, space: string, letter: string) => space + letter.toUpperCase());
+  const name = sourceName.replace(
+    /(^|\s)(\p{L})/gu,
+    (_match, space: string, letter: string) => space + letter.toUpperCase(),
+  );
   return { slug: slug || "other", name, sourceName };
 }

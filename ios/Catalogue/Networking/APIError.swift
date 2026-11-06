@@ -39,9 +39,9 @@ enum APIError: Error, Equatable, Sendable {
         switch self {
         case .transport:
             #if DEBUG
-            return "Can't reach the server. Is the API running? (docker compose up)"
+                return "Can't reach the server. Is the API running? (docker compose up)"
             #else
-            return "Check your connection and try again."
+                return "Check your connection and try again."
             #endif
         case .cancelled:
             return ""

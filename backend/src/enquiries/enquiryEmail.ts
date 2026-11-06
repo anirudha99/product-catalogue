@@ -13,7 +13,12 @@ export type Enquiry = {
  * The email the sales team receives. Product details come from our product source, never from
  * the request, so a customer can't put a fake product name or price in front of sales.
  */
-export function enquiryEmail(input: { enquiry: Enquiry; product: Product; reference: string; salesInbox: string }): MailMessage {
+export function enquiryEmail(input: {
+  enquiry: Enquiry;
+  product: Product;
+  reference: string;
+  salesInbox: string;
+}): MailMessage {
   const { enquiry, product, reference, salesInbox } = input;
   const price = `${product.price.currency} ${(product.price.amountMinor / 100).toFixed(2)}`;
 

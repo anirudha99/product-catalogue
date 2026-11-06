@@ -43,7 +43,8 @@ final class LiveAPIClient: APIClient {
 
     // MARK: - Transport
 
-    private func get<Response: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws(APIError) -> Response {
+    private func get<Response: Decodable>(_ path: String, query: [URLQueryItem] = []) async throws(APIError) -> Response
+    {
         var components = URLComponents(url: baseURL.appending(path: path), resolvingAgainstBaseURL: false)
         if !query.isEmpty { components?.queryItems = query }
         guard let url = components?.url else { throw .server }
@@ -68,7 +69,8 @@ final class LiveAPIClient: APIClient {
 
         guard let http = response as? HTTPURLResponse else { throw .server }
         guard (200..<300).contains(http.statusCode) else {
-            throw APIError.from(status: http.statusCode, body: data, retryAfter: http.value(forHTTPHeaderField: "Retry-After"))
+            throw APIError.from(
+                status: http.statusCode, body: data, retryAfter: http.value(forHTTPHeaderField: "Retry-After"))
         }
         do {
             return try JSONDecoder().decode(Response.self, from: data)

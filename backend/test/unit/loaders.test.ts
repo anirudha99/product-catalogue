@@ -26,7 +26,9 @@ describe("fetchFromFakeStore", () => {
 
   it("keeps the network error's code, e.g. a certificate problem behind a proxy", async () => {
     const fetchImpl = vi.fn(async () => {
-      throw new TypeError("fetch failed", { cause: Object.assign(new Error("self-signed"), { code: "SELF_SIGNED_CERT_IN_CHAIN" }) });
+      throw new TypeError("fetch failed", {
+        cause: Object.assign(new Error("self-signed"), { code: "SELF_SIGNED_CERT_IN_CHAIN" }),
+      });
     });
     await expect(fetchFromFakeStore("https://x.test", 5000, fetchImpl)()).rejects.toThrow(
       "Fake Store request failed: fetch failed (SELF_SIGNED_CERT_IN_CHAIN)",
@@ -37,7 +39,9 @@ describe("fetchFromFakeStore", () => {
     const fetchImpl = vi.fn(async () => {
       throw new DOMException("The operation was aborted due to timeout", "TimeoutError");
     });
-    await expect(fetchFromFakeStore("https://x.test", 5000, fetchImpl)()).rejects.toThrow("Fake Store request failed: timed out");
+    await expect(fetchFromFakeStore("https://x.test", 5000, fetchImpl)()).rejects.toThrow(
+      "Fake Store request failed: timed out",
+    );
   });
 });
 

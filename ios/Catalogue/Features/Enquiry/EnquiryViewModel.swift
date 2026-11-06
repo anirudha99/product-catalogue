@@ -35,7 +35,7 @@ final class EnquiryViewModel {
     }
 
     func submit() async {
-        guard phase == .editing else { return } // ignore a second tap while sending
+        guard phase == .editing else { return }  // ignore a second tap while sending
         formError = nil
         fieldErrors = quickCheck()
         guard fieldErrors.isEmpty else { return }
@@ -97,7 +97,7 @@ final class EnquiryViewModel {
     }
 }
 
-private extension String {
-    var trimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
-    var nilIfEmpty: String? { isEmpty ? nil : self }
+extension String {
+    fileprivate var trimmed: String { trimmingCharacters(in: .whitespacesAndNewlines) }
+    fileprivate var nilIfEmpty: String? { isEmpty ? nil : self }
 }

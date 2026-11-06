@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import Catalogue
 
 struct APIErrorTests {
@@ -29,14 +30,21 @@ struct APIErrorTests {
     }
 
     @Test func rateLimitCopyUsesRetryAfter() {
-        #expect(APIError.rateLimited(retryAfterSeconds: 900).userMessage == "Too many enquiries. Please try again in about 15 minutes.")
-        #expect(APIError.rateLimited(retryAfterSeconds: 30).userMessage == "Too many enquiries. Please try again in about 1 minute.")
-        #expect(APIError.rateLimited(retryAfterSeconds: nil).userMessage == "Too many enquiries. Please try again later.")
+        #expect(
+            APIError.rateLimited(retryAfterSeconds: 900).userMessage
+                == "Too many enquiries. Please try again in about 15 minutes.")
+        #expect(
+            APIError.rateLimited(retryAfterSeconds: 30).userMessage
+                == "Too many enquiries. Please try again in about 1 minute.")
+        #expect(
+            APIError.rateLimited(retryAfterSeconds: nil).userMessage == "Too many enquiries. Please try again later.")
     }
 
     @Test func everyUserFacingErrorHasCopy() {
-        let errors: [APIError] = [.transport, .validation(fields: [:], message: ""), .notFound,
-                                  .rateLimited(retryAfterSeconds: nil), .upstream, .server, .decoding]
+        let errors: [APIError] = [
+            .transport, .validation(fields: [:], message: ""), .notFound,
+            .rateLimited(retryAfterSeconds: nil), .upstream, .server, .decoding,
+        ]
         for error in errors {
             #expect(!error.userMessage.isEmpty, "no copy for \(error)")
         }

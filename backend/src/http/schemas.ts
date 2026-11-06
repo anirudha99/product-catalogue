@@ -60,7 +60,9 @@ const enquirySchema = z.strictObject({
       .pipe(z.email("Enter a valid email address.")),
   ),
   phone: optionalTrimmed(
-    z.string({ error: "Enter a valid phone number." }).regex(/^[0-9 +()-]{1,30}$/, "Enter a valid phone number (digits, spaces, + ( ) -)."),
+    z
+      .string({ error: "Enter a valid phone number." })
+      .regex(/^[0-9 +()-]{1,30}$/, "Enter a valid phone number (digits, spaces, + ( ) -)."),
   ),
   message: optionalTrimmed(
     z

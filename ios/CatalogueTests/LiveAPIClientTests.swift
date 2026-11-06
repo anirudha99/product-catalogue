@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import Catalogue
 
 /// Tests the real HTTP client against a stubbed network (URLProtocol), so URL building, encoding,
@@ -78,10 +79,12 @@ struct LiveAPIClientTests {
         let body = try Fixtures.data("error-validation.json")
         let api = client { request in (response(request, 400), body) }
 
-        await #expect(throws: APIError.validation(
-            fields: ["name": "Enter your name.", "email": "Enter a valid email address."],
-            message: "Some fields need attention."
-        )) {
+        await #expect(
+            throws: APIError.validation(
+                fields: ["name": "Enter your name.", "email": "Enter a valid email address."],
+                message: "Some fields need attention."
+            )
+        ) {
             try await api.submitEnquiry(EnquiryRequest(productId: "3", name: "", email: "x", phone: nil, message: nil))
         }
     }
@@ -91,7 +94,8 @@ struct LiveAPIClientTests {
         let api = client { request in (response(request, 429, headers: ["Retry-After": "120"]), body) }
 
         await #expect(throws: APIError.rateLimited(retryAfterSeconds: 120)) {
-            try await api.submitEnquiry(EnquiryRequest(productId: "3", name: "Ada", email: "ada@example.com", phone: nil, message: nil))
+            try await api.submitEnquiry(
+                EnquiryRequest(productId: "3", name: "Ada", email: "ada@example.com", phone: nil, message: nil))
         }
     }
 

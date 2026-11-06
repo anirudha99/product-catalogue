@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+
 @testable import Catalogue
 
 struct AppConfigTests {
@@ -8,13 +9,14 @@ struct AppConfigTests {
         #expect(config.apiBaseURL.absoluteString == "http://localhost:3000")
     }
 
-    @Test(arguments: [
-        [:],
-        ["APIBaseURL": ""],
-        ["APIBaseURL": "localhost:3000"],          // no scheme
-        ["APIBaseURL": "ftp://localhost"],         // not http(s)
-        ["APIBaseURL": "$(API_SCHEME)://$(API_HOST)"], // build setting not substituted
-    ] as [[String: String]])
+    @Test(
+        arguments: [
+            [:],
+            ["APIBaseURL": ""],
+            ["APIBaseURL": "localhost:3000"],  // no scheme
+            ["APIBaseURL": "ftp://localhost"],  // not http(s)
+            ["APIBaseURL": "$(API_SCHEME)://$(API_HOST)"],  // build setting not substituted
+        ] as [[String: String]])
     func rejectsMissingOrBadValues(info: [String: String]) {
         #expect(AppConfig(infoDictionary: info) == nil)
     }

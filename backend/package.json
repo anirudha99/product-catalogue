@@ -13,7 +13,9 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" vitest.config.ts",
+    "format:check": "prettier --check \"src/**/*.ts\" \"test/**/*.ts\" vitest.config.ts"
   },
   "dependencies": {
     "express": "^5.3.0",
@@ -26,6 +28,7 @@
     "@types/node": "^24.19.2",
     "@types/nodemailer": "^8.0.2",
     "@types/supertest": "^7.2.1",
+    "prettier": "^3.9.10",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
