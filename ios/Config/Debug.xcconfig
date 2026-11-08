@@ -1,0 +1,10 @@
+#include "Base.xcconfig"
+
+// API the app talks to. Combined in Config/Info.plist as $(API_SCHEME)://$(API_HOST),
+// so no "//" appears here (xcconfig would read it as a comment).
+// The iOS Simulator shares the Mac's network, so localhost reaches `docker compose up`.
+API_SCHEME = http
+API_HOST = localhost:3000
+
+// Optional, git-ignored personal overrides (e.g. a Mac's LAN IP to run on a real device).
+#include? "Local.xcconfig"

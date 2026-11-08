@@ -1,0 +1,11 @@
+{
+  "error": {
+    "code": "VALIDATION_FAILED",
+    "message": "Some fields need attention.",
+    "fields": {
+      "name": "Enter your name.",
+      "email": "Enter a valid email address."
+    },
+    "requestId": "00000000-0000-4000-8000-000000000001"
+  }
+}

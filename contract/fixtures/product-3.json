@@ -1,0 +1,18 @@
+{
+  "id": "3",
+  "title": "Mens Cotton Jacket",
+  "price": {
+    "amountMinor": 5599,
+    "currency": "USD"
+  },
+  "rating": {
+    "average": 4.7,
+    "count": 500
+  },
+  "imagePath": "/v1/products/3/image",
+  "description": "great outerwear jackets for Spring/Autumn/Winter, suitable for many occasions, such as working, hiking, camping, mountain/rock climbing, cycling, traveling or other outdoors. Good gift choice for you or your family member. A warm hearted love to Father, husband or son in this thanksgiving or Christmas Day.",
+  "category": {
+    "slug": "mens-clothing",
+    "name": "Men's Clothing"
+  }
+}

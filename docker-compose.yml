@@ -1,0 +1,49 @@
+# Backend + local mail inbox: `docker compose up`
+# Works with no .env file. To change a value, copy .env.example to .env and edit it.
+
+services:
+  api:
+    build:
+      context: ./backend
+      target: runtime
+    ports:
+      - "127.0.0.1:${PORT:-3000}:3000"  # this machine only
+    environment:
+      PORT: "3000"
+      PRODUCT_SOURCE: ${PRODUCT_SOURCE:-fakestore}
+      FAKESTORE_BASE_URL: ${FAKESTORE_BASE_URL:-https://fakestoreapi.com}
+      TOP_RATED_PRODUCT_IDS: ${TOP_RATED_PRODUCT_IDS:-3,5,11,12,18}
+      CACHE_TTL_SECONDS: ${CACHE_TTL_SECONDS:-300}
+      UPSTREAM_TIMEOUT_MS: ${UPSTREAM_TIMEOUT_MS:-5000}
+      SMTP_HOST: ${SMTP_HOST:-mailpit}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_SECURE: ${SMTP_SECURE:-false}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      MAIL_FROM: ${MAIL_FROM:-Catalogue <no-reply@example.test>}
+      SALES_INBOX: ${SALES_INBOX:-sales@example.test}
+      ENQUIRY_RATE_LIMIT_MAX: ${ENQUIRY_RATE_LIMIT_MAX:-5}
+      ENQUIRY_RATE_LIMIT_WINDOW_MS: ${ENQUIRY_RATE_LIMIT_WINDOW_MS:-900000}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    depends_on:
+      mailpit:
+        condition: service_started
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit:v1.33.0
+    ports:
+      - "127.0.0.1:8025:8025" # web inbox + API, this machine only (it shows customer details)
+      - "127.0.0.1:1025:1025" # SMTP, so the API can also run outside Docker (npm run dev)
+    environment:
+      MP_DISABLE_VERSION_CHECK: "true"
+    restart: unless-stopped
+
+  # Tests in a container: docker compose --profile test run --rm api-test
+  api-test:
+    profiles: ["test"]
+    build:
+      context: ./backend
+      target: test
+      additional_contexts:
+        contract: ./contract

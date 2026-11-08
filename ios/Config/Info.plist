@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- Merged with the keys Xcode generates. Kept outside the synced Catalogue/ folder so it is not copied as a resource. -->
+	<key>APIBaseURL</key>
+	<string>$(API_SCHEME)://$(API_HOST)</string>
+	<!-- Only local hosts (localhost, *.local, IP addresses) may use plain HTTP. Everything else needs HTTPS. -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
+	</dict>
+</dict>
+</plist>

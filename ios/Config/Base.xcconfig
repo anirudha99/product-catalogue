@@ -1,0 +1,14 @@
+// Settings shared by every configuration and both targets (app and tests).
+// The project file deliberately does not repeat these, so this file is the one place to change them.
+
+IPHONEOS_DEPLOYMENT_TARGET = 17.0
+TARGETED_DEVICE_FAMILY = 1
+
+// Swift 6 language mode with complete concurrency checking.
+// Xcode 26 templates default every type to @MainActor; we opt out and mark UI types @MainActor on purpose.
+SWIFT_VERSION = 6.0
+SWIFT_DEFAULT_ACTOR_ISOLATION = nonisolated
+SWIFT_APPROACHABLE_CONCURRENCY = YES
+
+// Simulator builds need no signing team. Leave empty so no personal or company team is committed.
+DEVELOPMENT_TEAM =

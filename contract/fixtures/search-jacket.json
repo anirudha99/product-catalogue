@@ -1,0 +1,57 @@
+{
+  "term": "jacket",
+  "results": [
+    {
+      "id": "3",
+      "title": "Mens Cotton Jacket",
+      "price": {
+        "amountMinor": 5599,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 4.7,
+        "count": 500
+      },
+      "imagePath": "/v1/products/3/image"
+    },
+    {
+      "id": "17",
+      "title": "Rain Jacket Women Windbreaker Striped Climbing Raincoats",
+      "price": {
+        "amountMinor": 3999,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 3.8,
+        "count": 679
+      },
+      "imagePath": "/v1/products/17/image"
+    },
+    {
+      "id": "16",
+      "title": "Lock and Love Women's Removable Hooded Faux Leather Moto Biker Jacket",
+      "price": {
+        "amountMinor": 2995,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 2.9,
+        "count": 340
+      },
+      "imagePath": "/v1/products/16/image"
+    },
+    {
+      "id": "15",
+      "title": "BIYLACLESEN Women's 3-in-1 Snowboard Jacket Winter Coats",
+      "price": {
+        "amountMinor": 5699,
+        "currency": "USD"
+      },
+      "rating": {
+        "average": 2.6,
+        "count": 235
+      },
+      "imagePath": "/v1/products/15/image"
+    }
+  ]
+}
