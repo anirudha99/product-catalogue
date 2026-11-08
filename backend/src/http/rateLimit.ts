@@ -3,7 +3,8 @@ import type { RequestHandler } from "express";
 import { sendError } from "./errorHandler.js";
 
 /**
- * Limits enquiries per client IP (in memory). Counts every attempt, valid or not.
+ * Limits enquiries per client IP (in memory). Counts every attempt that reaches the route, valid or not
+ * (bodies that aren't JSON or are over 10 KB are refused earlier, by express.json).
  * Known limits: behind a load balancer set Express "trust proxy" so req.ip is the client;
  * with more than one API instance, use a shared store (e.g. Redis) so the limit is global.
  */

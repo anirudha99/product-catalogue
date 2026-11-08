@@ -8,7 +8,7 @@ The design is in `docs/PLAN.md` and the decisions in `DECISIONS.md`. Read them b
 - Only `backend/src/products/` knows Fake Store exists. Everything else uses the `ProductSource` interface and our own `Product` type.
 - Only `backend/src/mail/SmtpMailer.ts` knows SMTP or nodemailer. Everything else uses the `Mailer` interface.
 - `http/` → services → `domain/`. Services never import Express. Adapters never import services. `domain/` imports nothing outside `domain/`.
-- iOS: views talk only to view models. View models talk only to the `APIClient` protocol. `URLSession` appears only in `LiveAPIClient.swift` (plus the `URLCache` setup in `CatalogueApp.swift`). `RemoteImage` is the one view allowed to load a URL.
+- iOS: views talk only to view models (by convention; the script does not check this one). View models talk only to the `APIClient` protocol. `URLSession` appears only in `LiveAPIClient.swift` (plus the `URLCache` setup in `CatalogueApp.swift`). `RemoteImage` is the one view allowed to load a URL.
 - All colours, fonts and spacing come from `Theme.swift`. No literal colours or font sizes in views.
 
 ## The API contract
@@ -37,7 +37,7 @@ The design is in `docs/PLAN.md` and the decisions in `DECISIONS.md`. Read them b
 | Run the backend + Mailpit | `docker compose up` |
 | Backend tests (Node ≥ 22.12) | `cd backend && npm test` |
 | Backend tests without local Node | `docker compose --profile test run --rm api-test` |
-| Everything (formatting, backend, iOS, boundaries) | `scripts/check.sh` |
+| Everything (contract fixtures, formatting, backend, iOS, boundaries) | `scripts/check.sh` |
 | Format the code | `cd backend && npm run format` · `xcrun swift-format format -i -r ios/Catalogue ios/CatalogueTests` |
 | End-to-end check (stack must be up) | `scripts/smoke.sh` |
 | Mailpit inbox | http://localhost:8025 |

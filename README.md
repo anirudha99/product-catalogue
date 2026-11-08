@@ -55,7 +55,7 @@ Open `ios/Catalogue.xcodeproj` in Xcode, pick any iPhone simulator, and press **
 ## Tests
 
 ```bash
-./scripts/check.sh   # formatting, backend tests, iOS tests, layer-boundary check
+./scripts/check.sh   # contract fixtures, formatting, backend tests, iOS tests, layer-boundary check
 ```
 
 Or one at a time:
@@ -65,7 +65,7 @@ Or one at a time:
 | Backend (Node ≥ 22.12) | `cd backend && npm ci && npm test` | 110 tests |
 | Backend, no local Node | `docker compose --profile test run --rm api-test` | same 110 |
 | iOS | ⌘U in Xcode | 47 tests |
-| Layer boundaries | `./scripts/check-boundaries.sh` | 9 rules |
+| Layer boundaries | `./scripts/check-boundaries.sh` | 10 rules |
 | Formatting | `cd backend && npm run format:check` · `xcrun swift-format lint --strict -r ios/Catalogue ios/CatalogueTests` | Prettier · swift-format |
 | End to end (stack running) | `./scripts/smoke.sh` | 5 checks |
 
@@ -191,11 +191,11 @@ CLAUDE.md    Instructions for the AI coding agent
 
 ## Time spent
 
-About **3 hours 15 minutes**, a little over the 2–3 hour time-box.
+About **3 hours**, within the 2–3 hour time-box.
 
 | Part | Time | What |
 |---|---|---|
 | Planning | ~1 h | The plan, an independent review of it, rework |
 | Building | ~1 h 20 min | Environment and project setup, then the five features with their tests |
 | Testing | ~15 min, within building | Each feature run on the simulator against the real backend |
-| Reviewing | ~55 min | Docs, a clean-copy run-through, an independent review of the repo and the fixes it led to, formatters |
+| Reviewing | ~40 min | Docs, a clean-copy run-through, an independent review of the repo and the fixes it led to, formatters |

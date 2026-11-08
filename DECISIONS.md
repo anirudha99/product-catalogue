@@ -91,7 +91,7 @@ Already in place:
 ## Changes from the original plan
 
 - **Error responses are never cached** (`Cache-Control: no-store`), so a temporary failure can't stick in the app's cache.
-- **The rate limit counts every enquiry attempt, valid or not.**
+- **The rate limit counts every enquiry attempt with a readable body, valid or not.** Bodies that aren't JSON or are over 10 KB are refused before it runs, and can't send email.
 - **There is an access log:** method, path, status, time. It never includes the query string, so search terms and customer details stay out of logs.
 - **The enquiry form has three states:** `editing / submitting / submitted`. Errors stay next to the form, so nothing the customer typed is lost.
 - **`Info.plist` lives in `ios/Config/`, outside the synced app folder.** Inside it, Xcode would copy the file as a resource and the build would fail.

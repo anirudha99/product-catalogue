@@ -35,6 +35,7 @@ rule "Only SmtpMailer knows nodemailer" 'nodemailer' backend/src -- backend/src/
 rule "Only the HTTP layer imports Express" 'from "express' backend/src -- backend/src/http backend/src/app.ts
 rule "Services depend on interfaces, not concrete adapters" \
   'FakeStoreProductSource|SmtpMailer|loaders\.js' backend/src/catalogue backend/src/enquiries backend/src/http
+rule "Adapters never import services or HTTP" 'from "\.\./(catalogue|enquiries|http)/' backend/src/products backend/src/mail
 rule "domain/ imports only domain/" 'from "\.\./' backend/src/domain
 
 # iOS
